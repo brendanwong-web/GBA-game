@@ -74,13 +74,20 @@ int main(void)
 	
     // Set Mode 2 DO NOT CHANGE!!
     *(unsigned short *) 0x4000000 = 0x40 | 0x2 | 0x1000;
-    
 	 fillSprites();
 	 fillPalette();
 	 init_player(&player);
-	 init_item(&pancake);
 	 init_spoon(&spoon);
-	 //tsstgt]mg
+	 for (int i=0;i<noItems;i++) {
+	   gameItems2[i].x = gameItemsx[i];
+	   gameItems2[i].y = gameItemsy[i];
+	   gameItems2[i].vx = gameItemsvx[i];
+	   gameItems2[i].vy = gameItemsvy[i];
+	   gameItems2[i].a = gameItemsa[i];
+	   int dropped = 0;
+	 }   
+
+	 //tsstgt]sss
     // Set Handler Function for interrupts and enable selected interrupts
     REG_INT = (int)&Handler;
     REG_IE |= INT_TIMER1 | INT_TIMER2;		// Enable Timer 2

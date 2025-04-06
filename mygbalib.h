@@ -6,6 +6,7 @@
 #define PLAY_MODE       1
 #define RESET_MODE       2
 int mode;
+#define noItems 3
 
 typedef struct gameCharacter {
    int x;
@@ -26,8 +27,13 @@ typedef struct gameItem {
 };
 
 struct gameCharacter player;
-struct gameItem pancake;
 struct gameItem spoon;
+int gameItemsx[noItems] = {80, 50, 30};
+int gameItemsy[noItems] = {20, 40, 60};
+int gameItemsvx[noItems] = {10, 5, 20};
+int gameItemsvy[noItems] = {-20, -5, -10};
+int gameItemsa[noItems] = {2, 1, 1};
+struct gameItem gameItems2[noItems];
 
 void init_player(struct gameCharacter* player) {
    player->x = 100;
@@ -44,28 +50,28 @@ void init_spoon(struct gameItem* spoon) {
    spoon->a = 0;
 }
 
-void init_item(struct gameItem* item) {
-   item->vy = -20;
-	item->vx = 15;
+void init_item(struct gameItem* item,int x,int y,int vx,int vy) {
+   item->vy = vy;
+	item->vx = vx;
 	item->a = 2;
-	item->x = 100;
-	item->y = 100;
+	item->x = x;
+	item->y = x;
 	item->dropped = 0;
 }
 
 void reset_game() {
     mode = 1;
 	 init_player(&player);
-	 init_item(&pancake);
+	 //init_item(&pancake, 100, 100, 10, -20);
 	 init_spoon(&spoon);
 
 }   
 
-u8 checkCollisions(struct gameCharacter* item1, struct gameItem* item) {
-  return (item->x >= item1->x && item->x <= item1->x + 16) &&
-  (item->y >= item1->y-12 && item->y <= item1->y + 4) ||
-  (item1->x >= item->x && item1->x <= item->x + 16) &&
-    (item->y >= item1->y-12 && item->y <= item1->y + 4);
+u8 checkCollisions(struct gameCharacter* item1, struct gameItem item) {
+  return (item.x >= item1->x && item.x <= item1->x + 16) &&
+  (item.y >= item1->y-12 && item.y <= item1->y + 4) ||
+  (item1->x >= item.x && item1->x <= item.x + 16) &&
+    (item.y >= item1->y-12 && item.y <= item1->y + 4);
 	}
 
 void buttonR() {
@@ -88,15 +94,17 @@ void buttonL() {
  	spoon.x--;
 } 
 
-void buttonU(struct gameItem* item) {
-   if (checkCollisions(&spoon, &pancake)) {
-         pancake.vy = -30;
-         int res = player.dir * pancake.vx;
+void buttonU() {
+   for (int i=0;i<noItems;i++) {
+      if (checkCollisions(&spoon, gameItems2[i])) {
+         gameItems2[i].vy = -gameItems2[i].vy;
+         int res = player.dir * gameItems2[i].vx;
          if (res < 0) {
-            pancake.vx = -pancake.vx;
+            gameItems2[i].vx = -gameItems2[i].vx;
          }   
-   		
-   }
+   	}
+   }   
+   
 }
 
 void buttonD() {
@@ -141,7 +149,7 @@ void checkbutton(void)
     }
     if ((buttons & KEY_UP) == KEY_UP)
     {
-        buttonU(&pancake);
+        buttonU();
     }
     if ((buttons & KEY_DOWN) == KEY_DOWN)
     {
@@ -153,32 +161,35 @@ void checkbutton(void)
 
 
 void gameLogicPs(void) {
-   	if (pancake.y <= 140 && pancake.dropped == 0) {
-	   		pancake.vy += pancake.a;
-	   		pancake.y += pancake.vy/5;
+   for (int i=0;i<noItems;i++) {
+      if (gameItems2[i].y <= 140 && gameItems2[i].dropped == 0) {
+	   		gameItems2[i].vy += gameItems2[i].a;
+	   		gameItems2[i].y += gameItems2[i].vy/5;
 		} else {
-		   pancake.y = 142;
-		   pancake.vx = 0;
-			pancake.dropped = 1;
+		   gameItems2[i].y = 142;
+		   gameItems2[i].vx = 0;
+			gameItems2[i].dropped = 1;
 		}
-		pancake.x += pancake.vx/6;
-		if (pancake.x >= 224) {
-		 pancake.x = 220;
-		 pancake.vx = -pancake.vx;
-		} else if (pancake.x <= 0) {
-		   pancake.x = 0;
-		   pancake.vx = -pancake.vx;
+		gameItems2[i].x += gameItems2[i].vx/6;
+		if (gameItems2[i].x >= 224) {
+		 gameItems2[i].x = 220;
+		 gameItems2[i].vx = -gameItems2[i].vx;
+		} else if (gameItems2[i].x <= 0) {
+		   gameItems2[i].x = 0;
+		   gameItems2[i].vx = -gameItems2[i].vx;
 		}  
+		if (gameItems2[i].dropped == 1) {
+		   drawSprite(14, 5, 50, 50);
+      	mode = 2;
+		}   else {
+      drawSprite(14, 5, 200, 160);
+   }   
+   }
+		
+		
 }
 
 void gameLogic(void) {
-   if (pancake.dropped == 1) {
-      drawSprite(14, 5, 50, 50);
-      mode = 2;
-   } else {
-      drawSprite(14, 5, 200, 160);
-   }   
-	
    
 }   
 
@@ -225,12 +236,15 @@ void redrawFrame() {
 		default:
 		   break;
    }
-   drawSprite(10, 2, pancake.x, pancake.y);
-   if (checkCollisions(&spoon, &pancake)) {
+   for (int i=0;i<noItems;i++) {
+    drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);  
+    if (checkCollisions(&spoon, gameItems2[i])) {
 	     drawSprite(8, 3, 0, 0);
 	  } else {
 	     drawSprite(8, 3, 240, 160);
 	  }   
+   }   
+   
    
 }   
 
