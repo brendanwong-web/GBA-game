@@ -2,6 +2,7 @@
 *.d
 *.i
 *.s
+*.gba
 
 # Object files
 *.o
