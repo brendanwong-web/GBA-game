@@ -87,7 +87,7 @@ int main(void)
 	   int dropped = 0;
 	 }   
 
-	 //tsstgt]sss
+	 //Changed comment
     // Set Handler Function for interrupts and enable selected interrupts
     REG_INT = (int)&Handler;
     REG_IE |= INT_TIMER1 | INT_TIMER2;		// Enable Timer 2
