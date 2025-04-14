@@ -20,11 +20,11 @@ This will be a fun gameboy game
 Repeat steps 2-9 from above
 
 ## TODO
-- menu: Start game, highscore board **Emilia**
-- timer **Emilia**
-- design: sprites (cook, egg, pancake, spoon, frying pan) **Henna**
-- coins **brendan**
-- number of bounces: counter **brendan**
-- pause **brendan**
-- level 2: pancake and egg **Henna/Emilia**
-- GAME OVER -text **Henna**
+- menu: Start game, highscore board // **Emilia**
+- timer // **Emilia**
+- design: sprites (cook, egg, pancake, spoon, frying pan) // **Henna**
+- coins // **brendan**
+- number of bounces: counter // **brendan**
+- pause // **brendan**
+- level 2: pancake and egg // **Henna/Emilia**
+- GAME OVER -text // **Henna**
