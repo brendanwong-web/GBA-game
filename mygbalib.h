@@ -1,12 +1,14 @@
 #include "sprites.h"
 #define INPUT                      (KEY_MASK & (~REG_KEYS))
 #define MaxY 140
+extern int gameMode;
 
 #define MENU_MODE        0
 #define PLAY_MODE       1
 #define RESET_MODE       2
 int mode;
 #define noItems 3
+extern int gameMode;
 
 typedef struct gameCharacter {
    int x;
@@ -180,7 +182,8 @@ void gameLogicPs(void) {
 		}  
 		if (gameItems2[i].dropped == 1) {
 		   drawSprite(14, 5, 50, 50);
-      	mode = 2;
+      	gameMode = 2;
+			return;
 		}   else {
       drawSprite(14, 5, 200, 160);
    }   
@@ -215,37 +218,35 @@ void fillSprites(void)
 	// draw all sprites on screen, but all of them outside of the screen (starting at position (240,160) the bottom right corner of the GBA screen)
     for(i = 0; i < 128; i++)
         drawSprite(0, i, 240,160);
-}
-
+} 
 
 void redrawFrame() {
-   if (mode == 2) {return;}
-   switch(player.dir) {
-      case 1:
-         {
-            drawSprite(0, 0, player.x, player.y);
-            drawSprite(4, 4, spoon.x, spoon.y);
-            break;
+   switch(gameMode) {
+      case 0: // valikko, jos teet sen myöhemmin
+         break;
+      case 1: // peli
+         switch(player.dir) {
+            case 1:
+               drawSprite(0, 0, player.x, player.y);
+               drawSprite(4, 4, spoon.x, spoon.y);
+               break;
+            case -1:
+               drawSprite(2, 0, player.x, player.y);
+               drawSprite(5, 4, spoon.x, spoon.y);
+               break;
          }
-		case -1:
-		   {
-			   drawSprite(2, 0, player.x, player.y);
-			   drawSprite(5, 4, spoon.x, spoon.y);
-			   break;
-			}			   
-		default:
-		   break;
+         for (int i=0;i<noItems;i++) {
+            drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);  
+            if (checkCollisions(&spoon, gameItems2[i])) {
+                drawSprite(8, 3, 0, 0);
+            } else {
+                drawSprite(8, 3, 240, 160);
+            }
+         }
+         break;
+
+      case 2: // game over
+         drawGameOver(); // ?? tähän se pitää tulla!
+         break;
    }
-   for (int i=0;i<noItems;i++) {
-    drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);  
-    if (checkCollisions(&spoon, gameItems2[i])) {
-	     drawSprite(8, 3, 0, 0);
-	  } else {
-	     drawSprite(8, 3, 240, 160);
-	  }   
-   }   
-   
-   
-}   
-
-
+}
