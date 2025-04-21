@@ -31,7 +31,7 @@ void Handler(void)
     
     REG_IF = REG_IF; // Update interrupt table, to confirm we have handled this interrupt
     
-    REG_IME = 0x01;  // Re-enable interrupt handlingss
+    REG_IME = 0x01;  // Re-enable interrupt handlings
 }
 
 
@@ -59,8 +59,8 @@ int main(void)
     REG_TM1D =	0xDE03;		// Runs game at approx 24fps
     REG_TM1CNT |= TIMER_FREQUENCY_64 | TIMER_ENABLE | TIMER_INTERRUPTS;
     
-    REG_TM2D = 60000;
-    REG_TM2CNT |= TIMER_FREQUENCY_256 | TIMER_ENABLE | TIMER_INTERRUPTS;
+    REG_TM2D = 59100;
+    REG_TM2CNT |= TIMER_FREQUENCY_256 | TIMER_ENABLE | TIMER_INTERRUPTS; //This timer interrupts every 0.1s
   	 while(1){
      }
 }
