@@ -50,7 +50,7 @@ void Handler(void)
        if (gameMode == PLAY_MODE) {
           redrawFrame();
        }  else {
-          drawSprite(15, 12, 130, 0);
+          drawGameOver();
        }  
 
     }
@@ -65,7 +65,7 @@ void Handler(void)
     
     REG_IF = REG_IF; // Update interrupt table, to confirm we have handled this interrupt
     
-    REG_IME = 0x01;  // Re-enable interrupt handling
+    REG_IME = 0x01;  // Re-enable interrupt handling r
 }
 void drawGameOver() {
     int x = 66;
@@ -87,11 +87,10 @@ void drawGameOver() {
 // -----------------------------------------------------------------------------
 // Project Entry Point
 // -----------------------------------------------------------------------------
-int gameMode=1; // 0 = valikko, 1 = peli, 2 = game over
+int gameMode=PLAY_MODE; // 0 = valikko, 1 = peli, 2 = game over
 int main(void)
 {
 
-	
     // Set Mode 2 DO NOT CHANGE!!
     *(unsigned short *) 0x4000000 = 0x40 | 0x2 | 0x1000;
 	 fillSprites();
@@ -111,11 +110,7 @@ int main(void)
     
     REG_TM2D = 55535;
     REG_TM2CNT |= TIMER_FREQUENCY_256 | TIMER_ENABLE | TIMER_INTERRUPTS;
-	 while(1){
-    vid_vsync();
-    if(gameMode == 2){
-        drawGameOver();
-    }
+  	 while(1){
+      vid_vsync();
 }
-// sulje main() ilman returnia
 }

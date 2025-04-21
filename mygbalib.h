@@ -78,7 +78,14 @@ void reset_game() {
 	 //init_item(&pancake, 100, 100, 10, -20);
 	 init_spoon(&spoon);
 	 init_items();
-
+    drawSprite8(TILE_G, 90, 240, 160); // G
+    drawSprite8(TILE_A, 91, 240, 160); // A
+    drawSprite8(TILE_M, 92, 240, 160); // M
+    drawSprite8(TILE_E, 93, 240, 160); // E
+    drawSprite8(TILE_O, 94, 240, 160); // O (väli jälkeen E)
+    drawSprite8(TILE_V, 95, 240, 160); // V
+    drawSprite8(TILE_E, 96, 240, 160); // E again
+    drawSprite8(TILE_R, 97, 240, 160); // R
 }   
 
 u8 checkCollisions(struct gameCharacter* item1, struct gameItem item) {
@@ -183,26 +190,25 @@ void gameLogicPs(void) {
       if (gameItems2[i].y <= 140 && gameItems2[i].dropped == 0) {
 	   		gameItems2[i].vy += gameItems2[i].a;
 	   		gameItems2[i].y += gameItems2[i].vy/5;
-		} else {
-		   gameItems2[i].y = 142;
-		   gameItems2[i].vx = 0;
-			gameItems2[i].dropped = 1;
-		}
-		gameItems2[i].x += gameItems2[i].vx/6;
-		if (gameItems2[i].x >= 224) {
-		 gameItems2[i].x = 220;
-		 gameItems2[i].vx = -gameItems2[i].vx;
-		} else if (gameItems2[i].x <= 0) {
-		   gameItems2[i].x = 0;
-		   gameItems2[i].vx = -gameItems2[i].vx;
-		}  
-		if (gameItems2[i].dropped == 1) {
-		   drawSprite(14, 5, 50, 50);
-      	gameMode = RESET_MODE;
-			return;
-   }
-		
-		
+  		} else {
+  		   gameItems2[i].y = 142;
+  		   gameItems2[i].vx = 0;
+  			gameItems2[i].dropped = 1;
+  		}
+		 gameItems2[i].x += gameItems2[i].vx/6;
+  		if (gameItems2[i].x >= 224) {
+  		 gameItems2[i].x = 220;
+  		 gameItems2[i].vx = -gameItems2[i].vx;
+  		} else if (gameItems2[i].x <= 0) {
+  		   gameItems2[i].x = 0;
+  		   gameItems2[i].vx = -gameItems2[i].vx;
+  		}  
+  		if (gameItems2[i].dropped == 1) {
+  		   drawSprite(14, 5, 50, 50);
+        	gameMode = RESET_MODE;
+  			return;
+     }
+}
 }
 
 void gameLogic(void) {
