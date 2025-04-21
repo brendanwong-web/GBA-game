@@ -7,6 +7,9 @@ extern int gameMode;
 #define PLAY_MODE       1
 #define RESET_MODE       2
 #define noItems 3
+#define cooldown 5
+int cooldownTimer = 0;
+int gameTimer = 0;
 int gameMode;
 int currLevel = 1;
 int countBounce = 0;
@@ -151,12 +154,14 @@ void buttonL() {
 
 void buttonU() {
    for (int i=0;i<noItems;i++) {
+     if (cooldownTimer != 0) {return;}
       if (checkCollisions(&spoon, gameItems2[i])) {
          gameItems2[i].vy = -40;
          if (player.dir * gameItems2[i].vx < 0) {
             gameItems2[i].vx = -gameItems2[i].vx;
          }   
       countBounce += 1;
+      cooldownTimer = cooldown;
    	}
    }   
    
@@ -234,6 +239,10 @@ void gameLogicPs(void) {
   	 gameItems2[i].dropped = 1;
     } 
   }  
+  if (cooldownTimer > 0) {   
+    cooldownTimer -= 1;
+  }  
+  gameTimer += 1;
 }
 
 void gameLogic(void) {
@@ -280,6 +289,7 @@ void fillSprites(void)
 } 
 
 void redrawFrame() {
+  for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);} //clear all sprites at the start of every frame;
    switch(player.dir) {
       case 1:
          {
@@ -300,9 +310,21 @@ void redrawFrame() {
    drawSprite8(res1, 25, 232-8, 8);  
    drawSprite8(res2, 26, 232-16, 8);  
    
+  // Draw game timer
+   int dig1 = NUMBERS + (gameTimer/10)%10;
+   int dig2 = NUMBERS+ gameTimer/100;
+   drawSprite8(dig1, 27, 200-8, 8);  
+   drawSprite8(dig2, 28, 200-16, 8);  
+   
+   // Draw items on screen
    for (int i=0;i<noItems;i++) {
-    drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);  // Draw items on screen 
+    drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);   
    }   
+   
+   // Draw cooldown
+   if (cooldownTimer > 0) {
+     drawSprite(20, 70, 100, 8);
+   }
  }  
 
 
