@@ -7,7 +7,7 @@ extern int gameMode;
 #define PLAY_MODE       1
 #define RESET_MODE       2
 #define noItems 3
-#define cooldown 5
+#define cooldown 10
 int cooldownTimer = 0;
 int gameTimer = 0;
 int gameMode;
@@ -153,18 +153,19 @@ void buttonL() {
 } 
 
 void buttonU() {
+   if (cooldownTimer != 0) {return;}
+   cooldownTimer = cooldown;
    for (int i=0;i<noItems;i++) {
-     if (cooldownTimer != 0) {return;}
+
       if (checkCollisions(&spoon, gameItems2[i])) {
          gameItems2[i].vy = -40;
          if (player.dir * gameItems2[i].vx < 0) {
             gameItems2[i].vx = -gameItems2[i].vx;
          }   
       countBounce += 1;
-      cooldownTimer = cooldown;
    	}
    }   
-   
+
 }
 
 void buttonD() {
@@ -315,6 +316,7 @@ void redrawFrame() {
    int dig2 = NUMBERS+ gameTimer/100;
    drawSprite8(dig1, 27, 200-8, 8);  
    drawSprite8(dig2, 28, 200-16, 8);  
+   
    
    // Draw items on screen
    for (int i=0;i<noItems;i++) {
