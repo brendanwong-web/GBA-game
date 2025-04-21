@@ -21,9 +21,9 @@ Repeat steps 2-9 from above
 
 ## TODO
 - menu: Start game, highscore board // **Emilia**
-- timer // **Emilia**
+- timer // **Brendan**
 - design: sprites (cook, egg, pancake, spoon, frying pan) // **Henna**
-- coins // **brendan**
+- coins // **Emilia**
 - number of bounces: counter // **brendan**
 - pause // **brendan**
 - level 2: pancake and egg // **Henna/Emilia**
