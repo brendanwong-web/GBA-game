@@ -44,16 +44,20 @@ void Handler(void)
     REG_IME = 0x00; // Stop all other interrupt handling, while we handle this current one
     if ((REG_IF & INT_TIMER1) == INT_TIMER1) // TODO: replace XXX with the specific interrupt you are handling
     {
-       // update variables as functions
-       // key_pollst();
+       // update variables as function
        checkbutton();
        gameLogic();
-       redrawFrame();
+       if (gameMode == PLAY_MODE) {
+          redrawFrame();
+       }  else {
+          drawSprite(15, 12, 130, 0);
+       }  
+
     }
     
     if ((REG_IF & INT_TIMER2) == INT_TIMER2) // TODO: replace XXX with the specific interrupt you are handling
     {
-       // update variables as functions
+       // update variables as functions 
        // key_poll();
        gameLogicPs();
     }
@@ -76,18 +80,11 @@ int main(void)
     *(unsigned short *) 0x4000000 = 0x40 | 0x2 | 0x1000;
 	 fillSprites();
 	 fillPalette();
+	 gameMode = 1;
 	 init_player(&player);
-	 init_spoon(&spoon);
-	 for (int i=0;i<noItems;i++) {
-	   gameItems2[i].x = gameItemsx[i];
-	   gameItems2[i].y = gameItemsy[i];
-	   gameItems2[i].vx = gameItemsvx[i];
-	   gameItems2[i].vy = gameItemsvy[i];
-	   gameItems2[i].a = gameItemsa[i];
-	   int dropped = 0;
-	 }   
-
-	 //Changed comment
+	 init_spoon(&spoon); 
+   init_items();
+	 //Changed comment s
     // Set Handler Function for interrupts and enable selected interrupts
     REG_INT = (int)&Handler;
     REG_IE |= INT_TIMER1 | INT_TIMER2;		// Enable Timer 2
