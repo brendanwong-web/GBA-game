@@ -6,7 +6,7 @@ extern int gameMode;
 #define MENU_MODE        0
 #define PLAY_MODE       1
 #define RESET_MODE       2
-int mode;
+int gameMode;
 #define noItems 3
 extern int gameMode;
 
@@ -61,11 +61,23 @@ void init_item(struct gameItem* item,int x,int y,int vx,int vy) {
 	item->dropped = 0;
 }
 
+void init_items() {
+	 for (int i=0;i<noItems;i++) {
+	   gameItems2[i].x = gameItemsx[i];
+	   gameItems2[i].y = gameItemsy[i];
+	   gameItems2[i].vx = gameItemsvx[i];
+	   gameItems2[i].vy = gameItemsvy[i];
+	   gameItems2[i].a = gameItemsa[i];
+	   gameItems2[i].dropped = 0;
+	 }   
+}  
+
 void reset_game() {
-    mode = 1;
+   gameMode = PLAY_MODE;
 	 init_player(&player);
 	 //init_item(&pancake, 100, 100, 10, -20);
 	 init_spoon(&spoon);
+	 init_items();
 
 }   
 
@@ -113,6 +125,10 @@ void buttonD() {
    reset_game();
 }   
 
+void buttonS() {
+   reset_game();
+}   
+
 void drawSprite(int numb, int N, int x, int y)
 {
 	// Same as CA2, make specific sprite (based on its name/numb) appear on screen, as slide number N (each sprite needs a different, arbitrary, N >= 0)
@@ -139,7 +155,7 @@ void checkbutton(void)
     }
     if ((buttons & KEY_START) == KEY_START)
     {
-        // buttonS();
+        buttonS();
     }
     if ((buttons & KEY_RIGHT) == KEY_RIGHT)
     {
@@ -155,7 +171,7 @@ void checkbutton(void)
     }
     if ((buttons & KEY_DOWN) == KEY_DOWN)
     {
-        if (mode == 2) {
+        if (gameMode == 2) {
         buttonD();
      }   
     }
@@ -182,11 +198,8 @@ void gameLogicPs(void) {
 		}  
 		if (gameItems2[i].dropped == 1) {
 		   drawSprite(14, 5, 50, 50);
-      	gameMode = 2;
+      	gameMode = RESET_MODE;
 			return;
-		}   else {
-      drawSprite(14, 5, 200, 160);
-   }   
    }
 		
 		
@@ -221,32 +234,27 @@ void fillSprites(void)
 } 
 
 void redrawFrame() {
-   switch(gameMode) {
-      case 0: // valikko, jos teet sen myöhemmin
-         break;
-      case 1: // peli
-         switch(player.dir) {
-            case 1:
-               drawSprite(0, 0, player.x, player.y);
-               drawSprite(4, 4, spoon.x, spoon.y);
-               break;
-            case -1:
-               drawSprite(2, 0, player.x, player.y);
-               drawSprite(5, 4, spoon.x, spoon.y);
-               break;
+   switch(player.dir) {
+      case 1:
+         {
+            drawSprite(0, 0, player.x, player.y);
+            drawSprite(4, 4, spoon.x, spoon.y);
+            break;
          }
-         for (int i=0;i<noItems;i++) {
-            drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);  
-            if (checkCollisions(&spoon, gameItems2[i])) {
-                drawSprite(8, 3, 0, 0);
-            } else {
-                drawSprite(8, 3, 240, 160);
-            }
-         }
-         break;
-
-      case 2: // game over
-         drawGameOver(); // ?? tähän se pitää tulla!
-         break;
+		case -1:
+		   {
+			   drawSprite(2, 0, player.x, player.y);
+			   drawSprite(5, 4, spoon.x, spoon.y);
+			   break;
+			}			   
    }
+   for (int i=0;i<noItems;i++) {
+    drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);  
+    if (checkCollisions(&spoon, gameItems2[i])) {
+	     drawSprite(8, 3, 0, 0);
+	  } else {
+	     drawSprite(8, 3, 240, 160);
+	  }   
+   }   
+
 }
