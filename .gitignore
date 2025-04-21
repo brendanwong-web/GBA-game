@@ -3,6 +3,7 @@
 *.i
 *.s
 *.gba
+ca2.vhw
 
 # Object files
 *.o
