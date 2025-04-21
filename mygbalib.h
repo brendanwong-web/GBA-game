@@ -1,12 +1,14 @@
 #include "sprites.h"
 #define INPUT                      (KEY_MASK & (~REG_KEYS))
 #define MaxY 140
+extern int gameMode;
 
 #define MENU_MODE        0
 #define PLAY_MODE       1
 #define RESET_MODE       2
 int gameMode;
 #define noItems 3
+extern int gameMode;
 
 typedef struct gameCharacter {
    int x;
@@ -197,9 +199,7 @@ void gameLogicPs(void) {
 		if (gameItems2[i].dropped == 1) {
 		   drawSprite(14, 5, 50, 50);
       	gameMode = RESET_MODE;
-		}   else {
-      drawSprite(14, 5, 200, 160);
-   }   
+			return;
    }
 		
 		
@@ -231,8 +231,7 @@ void fillSprites(void)
 	// draw all sprites on screen, but all of them outside of the screen (starting at position (240,160) the bottom right corner of the GBA screen)
     for(i = 0; i < 128; i++)
         drawSprite(0, i, 240,160);
-}
-
+} 
 
 void redrawFrame() {
    switch(player.dir) {
@@ -257,8 +256,5 @@ void redrawFrame() {
 	     drawSprite(8, 3, 240, 160);
 	  }   
    }   
-   
-   
-}   
 
-
+}

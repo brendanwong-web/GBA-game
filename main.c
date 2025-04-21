@@ -67,11 +67,27 @@ void Handler(void)
     
     REG_IME = 0x01;  // Re-enable interrupt handling
 }
+void drawGameOver() {
+    int x = 66;
+    int y = 70;
+    int spacing = 12;
+
+    drawSprite8(TILE_G, 90, x + spacing*0, y); // G
+    drawSprite8(TILE_A, 91, x + spacing*1, y); // A
+    drawSprite8(TILE_M, 92, x + spacing*2, y); // M
+    drawSprite8(TILE_E, 93, x + spacing*3, y); // E
+    drawSprite8(TILE_O, 94, x + spacing*5, y); // O (väli jälkeen E)
+    drawSprite8(TILE_V, 95, x + spacing*6, y); // V
+    drawSprite8(TILE_E, 96, x + spacing*7, y); // E again
+    drawSprite8(TILE_R, 97, x + spacing*8, y); // R
+}
+
 
 
 // -----------------------------------------------------------------------------
 // Project Entry Point
 // -----------------------------------------------------------------------------
+int gameMode=1; // 0 = valikko, 1 = peli, 2 = game over
 int main(void)
 {
 
@@ -95,10 +111,11 @@ int main(void)
     
     REG_TM2D = 55535;
     REG_TM2CNT |= TIMER_FREQUENCY_256 | TIMER_ENABLE | TIMER_INTERRUPTS;
-    while(1) {
-	    vid_vsync();
-		 };
-
-	return 0;
-} 
-
+	 while(1){
+    vid_vsync();
+    if(gameMode == 2){
+        drawGameOver();
+    }
+}
+// sulje main() ilman returnia
+}
