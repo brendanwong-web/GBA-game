@@ -6,9 +6,10 @@ extern int gameMode;
 #define MENU_MODE        0
 #define PLAY_MODE       1
 #define RESET_MODE       2
-int gameMode;
 #define noItems 3
-extern int gameMode;
+int gameMode;
+int currLevel = 1;
+int countBounce = 0;
 
 typedef struct gameCharacter {
    int x;
@@ -30,6 +31,7 @@ typedef struct gameItem {
 
 struct gameCharacter player;
 struct gameItem spoon;
+
 int gameItemsx[noItems] = {80, 50, 30};
 int gameItemsy[noItems] = {20, 40, 60};
 int gameItemsvx[noItems] = {10, 5, 20};
@@ -62,18 +64,50 @@ void init_item(struct gameItem* item,int x,int y,int vx,int vy) {
 }
 
 void init_items() {
-	 for (int i=0;i<noItems;i++) {
+	 for (int i=0;i<currLevel;i++) {
 	   gameItems2[i].x = gameItemsx[i];
 	   gameItems2[i].y = gameItemsy[i];
 	   gameItems2[i].vx = gameItemsvx[i];
 	   gameItems2[i].vy = gameItemsvy[i];
 	   gameItems2[i].a = gameItemsa[i];
 	   gameItems2[i].dropped = 0;
+	 }
+	 for (int i=currLevel;i<noItems;i++) {
+	   gameItems2[i].x = 240;
+	   gameItems2[i].y = 160;
+	   gameItems2[i].vx = 0;
+	   gameItems2[i].vy = 0;
+	   gameItems2[i].a = 0;
+	   gameItems2[i].dropped = 0;
 	 }   
-}  
+} 
+
+void drawSprite8(int numb, int N, int x, int y)
+{
+    // Gift function: displays sprite number numb on screen at position (x,y), as sprite object N
+    *(unsigned short *)(0x7000000 + 8*N) = y | 0x2000;
+    *(unsigned short *)(0x7000002 + 8*N) = x;
+    *(unsigned short *)(0x7000004 + 8*N) = numb*2;
+}
+
+void drawGameOver() {
+    int x = 66;
+    int y = 70;
+    int spacing = 12;
+
+    drawSprite8(TILE_G, 90, x + spacing*0, y); // G
+    drawSprite8(TILE_A, 91, x + spacing*1, y); // A
+    drawSprite8(TILE_M, 92, x + spacing*2, y); // M
+    drawSprite8(TILE_E, 93, x + spacing*3, y); // E
+    drawSprite8(TILE_O, 94, x + spacing*5, y); // O (väli jälkeen E)
+    drawSprite8(TILE_V, 95, x + spacing*6, y); // V
+    drawSprite8(TILE_E, 96, x + spacing*7, y); // E again
+    drawSprite8(TILE_R, 97, x + spacing*8, y); // R
+}
 
 void reset_game() {
    gameMode = PLAY_MODE;
+   countBounce = 0;
 	 init_player(&player);
 	 //init_item(&pancake, 100, 100, 10, -20);
 	 init_spoon(&spoon);
@@ -118,11 +152,11 @@ void buttonL() {
 void buttonU() {
    for (int i=0;i<noItems;i++) {
       if (checkCollisions(&spoon, gameItems2[i])) {
-         gameItems2[i].vy = -gameItems2[i].vy;
-         int res = player.dir * gameItems2[i].vx;
-         if (res < 0) {
+         gameItems2[i].vy = -40;
+         if (player.dir * gameItems2[i].vx < 0) {
             gameItems2[i].vx = -gameItems2[i].vx;
          }   
+      countBounce += 1;
    	}
    }   
    
@@ -186,33 +220,39 @@ void checkbutton(void)
 
 
 void gameLogicPs(void) {
-   for (int i=0;i<noItems;i++) {
-      if (gameItems2[i].y <= 140 && gameItems2[i].dropped == 0) {
-	   		gameItems2[i].vy += gameItems2[i].a;
+  // Iterate over all items
+   for (int i=0;i<currLevel;i++) {
+     // While item is in the air
+     if (gameItems2[i].y <= 140 && gameItems2[i].dropped == 0) {
+        gameItems2[i].vy > 30 ? gameItems2[i].vy = 15 : (gameItems2[i].vy += gameItems2[i].a);
 	   		gameItems2[i].y += gameItems2[i].vy/5;
-  		} else {
-  		   gameItems2[i].y = 142;
-  		   gameItems2[i].vx = 0;
-  			gameItems2[i].dropped = 1;
-  		}
-		 gameItems2[i].x += gameItems2[i].vx/6;
-  		if (gameItems2[i].x >= 224) {
-  		 gameItems2[i].x = 220;
-  		 gameItems2[i].vx = -gameItems2[i].vx;
-  		} else if (gameItems2[i].x <= 0) {
-  		   gameItems2[i].x = 0;
-  		   gameItems2[i].vx = -gameItems2[i].vx;
-  		}  
-  		if (gameItems2[i].dropped == 1) {
-  		   drawSprite(14, 5, 50, 50);
-        	gameMode = RESET_MODE;
-  			return;
-     }
-}
+	   		gameItems2[i].x += gameItems2[i].vx/6;
+     } else {
+     // Item dropped
+  	 gameItems2[i].y = 142;
+  	 gameItems2[i].vx = 0;
+  	 gameItems2[i].dropped = 1;
+    } 
+  }  
 }
 
 void gameLogic(void) {
-   
+  // any logic here runs at 24fps
+   for (int i=0;i<noItems;i++) {
+     if (gameItems2[i].x >= 224) { //Item bounce off right screen
+  		 gameItems2[i].x = 220;
+  		 gameItems2[i].vx = -gameItems2[i].vx;
+  		} 
+      else if (gameItems2[i].x <= 0) { //Item bounce off left screen
+  		   gameItems2[i].x = 0;
+  		   gameItems2[i].vx = -gameItems2[i].vx;
+  		} 
+  		
+  		// Check if item is dropped on the ground
+  		if (gameItems2[i].dropped == 1) {
+        	gameMode = RESET_MODE;
+      }  
+      } 
 }   
 
 
@@ -254,13 +294,15 @@ void redrawFrame() {
 			   break;
 			}			   
    }
+   // Draw bounce counter
+   int res1 = NUMBERS + countBounce%10;
+   int res2 = NUMBERS+ countBounce/10;
+   drawSprite8(res1, 25, 232-8, 8);  
+   drawSprite8(res2, 26, 232-16, 8);  
+   
    for (int i=0;i<noItems;i++) {
-    drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);  
-    if (checkCollisions(&spoon, gameItems2[i])) {
-	     drawSprite(8, 3, 0, 0);
-	  } else {
-	     drawSprite(8, 3, 240, 160);
-	  }   
+    drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);  // Draw items on screen 
    }   
+ }  
 
-}
+
