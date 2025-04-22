@@ -9,13 +9,14 @@ extern int gameMode;
 #define noItems 3
 #define cooldown 10
 #define noCoins 4
-#define jumpheight 8
+#define jumpheight 6
 #define maxItemVy 20
 int cooldownTimer = 0;
 int gameTimer = 0;
 int gameMode;
 int currLevel = 1;
 int countBounce = 0;
+int collision = 0;
 
 void drawSprite(int numb, int N, int x, int y)
 {
@@ -48,14 +49,16 @@ struct gameItem spoon;
 struct gameItem gameItems2[noItems];
 struct gameItem coins[noCoins];
 
+// Init item positions
 int gameItemsx[noItems] = {80, 50, 30};
 int gameItemsy[noItems] = {20, 40, 60};
 int gameItemsvx[noItems] = {10, 5, 20};
 int gameItemsvy[noItems] = {-20, -5, -10};
 int gameItemsa[noItems] = {2, 1, 1};
 
+// Init coin positions
 int coinsx[noCoins] = {20, 40, 220, 200};
-int coinsy[noCoins] = {30, 40, 60, 80};
+int coinsy[noCoins] = {20, 40, 60, 80};
 
 
 void init_player(struct gameCharacter* player) {
@@ -132,6 +135,11 @@ void drawGameOver() {
     drawSprite8(TILE_R, 97, x + spacing*8, y); // R
 }
 
+void drawMenu() {
+    for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
+    
+}  
+
 void reset_game() {
    gameMode = PLAY_MODE;
    countBounce = 0;
@@ -197,7 +205,7 @@ void buttonS() {
 
 void buttonA() {
    if (player.y < MaxY) {return;}
-   player.y -= 1;
+   player.y -= 10;
    player.vy = -jumpheight;
 }  
 
@@ -205,10 +213,10 @@ void buttonB() {
     if (cooldownTimer != 0) {return;}
    cooldownTimer = cooldown;
    for (int i=0;i<currLevel;i++) {
-      if (checkCollisions(&spoon, gameItems2[i])) {
-         gameItems2[i].vy = -40;
-         if (player.dir * gameItems2[i].vx < 0) {
-            gameItems2[i].vx = -gameItems2[i].vx;
+      if (collision != 0) {
+         gameItems2[collision-1].vy = -40;
+         if (player.dir * gameItems2[collision-1].vx < 0) {
+            gameItems2[collision-1].vx = -gameItems2[collision-1].vx;
          }   
       countBounce += 1;
    	}
@@ -296,7 +304,7 @@ void gameLogicPs(void) {
 
 void gameLogic(void) {
   // any logic here runs at 24fps
-   for (int i=0;i<noItems;i++) {
+   for (int i=0;i<currLevel;i++) {
      if (gameItems2[i].x >= 224) { //Item bounce off right screen
   		 gameItems2[i].x = 220;
   		 gameItems2[i].vx = -gameItems2[i].vx;
@@ -309,6 +317,10 @@ void gameLogic(void) {
   		// Check if item is dropped on the ground
   		if (gameItems2[i].dropped == 1) {
         	gameMode = RESET_MODE;
+      }  
+      
+      if (checkCollisions(&spoon, gameItems2[i])) {
+        collision = i+1;
       }  
       } 
 }   
@@ -381,7 +393,7 @@ void redrawFrame() {
    // Debug
    for (int i=0;i<currLevel;i++) {
         if (checkCollisions(&spoon, gameItems2[i])) {
-          drawSprite(LIFE_1, 95, 100, 100);
+          drawSprite(LIFE_1, 95, 100, 0);
         } else {
          drawSprite(LIFE_1, 95, 240, 160);
         }  

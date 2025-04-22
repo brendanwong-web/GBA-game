@@ -16,8 +16,10 @@ void Handler(void)
        gameLogic();
        if (gameMode == PLAY_MODE) {
           redrawFrame();
-       }  else {
+       }  else if (gameMode == RESET_MODE) {
           drawGameOver();
+       }  else if (gameMode == MENU_MODE ){
+         drawMenu();
        }  
 
     }
@@ -50,8 +52,7 @@ int main(void)
 	 init_player(&player);
 	 init_spoon(&spoon); 
    init_items();   
-   init_coins(); //init coinsss
-  
+   init_coins(); //init coinss
     // Set Handler Function for interrupts and enable selected interrupts
     REG_INT = (int)&Handler;
     REG_IE |= INT_TIMER1 | INT_TIMER2;		// Enable Timer 2
