@@ -8,11 +8,22 @@ extern int gameMode;
 #define RESET_MODE       2
 #define noItems 3
 #define cooldown 10
+#define noCoins 4
+#define jumpheight 8
+#define maxItemVy 20
 int cooldownTimer = 0;
 int gameTimer = 0;
 int gameMode;
 int currLevel = 1;
 int countBounce = 0;
+
+void drawSprite(int numb, int N, int x, int y)
+{
+	// Same as CA2, make specific sprite (based on its name/numb) appear on screen, as slide number N (each sprite needs a different, arbitrary, N >= 0)
+    *(unsigned short *)(0x7000000 + 8*N) = y | 0x2000; // atr0 sets y as bits 0-7 and enables 8bpp, 
+    *(unsigned short *)(0x7000002 + 8*N) = x | 0x4000; // atr1 sets x and enables sprite shape 16x16
+    *(unsigned short *)(0x7000004 + 8*N) = numb*8; // atr2
+}
 
 typedef struct gameCharacter {
    int x;
@@ -34,13 +45,18 @@ typedef struct gameItem {
 
 struct gameCharacter player;
 struct gameItem spoon;
+struct gameItem gameItems2[noItems];
+struct gameItem coins[noCoins];
 
 int gameItemsx[noItems] = {80, 50, 30};
 int gameItemsy[noItems] = {20, 40, 60};
 int gameItemsvx[noItems] = {10, 5, 20};
 int gameItemsvy[noItems] = {-20, -5, -10};
 int gameItemsa[noItems] = {2, 1, 1};
-struct gameItem gameItems2[noItems];
+
+int coinsx[noCoins] = {20, 40, 220, 200};
+int coinsy[noCoins] = {30, 40, 60, 80};
+
 
 void init_player(struct gameCharacter* player) {
    player->x = 100;
@@ -50,7 +66,7 @@ void init_player(struct gameCharacter* player) {
 
 void init_spoon(struct gameItem* spoon) {
    spoon->x = player.x;
-   spoon->y = player.y-16;
+   spoon->y = player.y-20;
    spoon->dropped = 0;
    spoon->vx = 0;
    spoon->vy = 0;
@@ -67,7 +83,7 @@ void init_item(struct gameItem* item,int x,int y,int vx,int vy) {
 }
 
 void init_items() {
-	 for (int i=0;i<currLevel;i++) {
+	 for (int i=0;i<=currLevel;i++) {
 	   gameItems2[i].x = gameItemsx[i];
 	   gameItems2[i].y = gameItemsy[i];
 	   gameItems2[i].vx = gameItemsvx[i];
@@ -84,6 +100,14 @@ void init_items() {
 	   gameItems2[i].dropped = 0;
 	 }   
 } 
+
+void init_coins() {
+   int i;
+   for (i=0;i<noCoins;i++) {
+      coins[i].x = coinsx[i];
+      coins[i].y = coinsy[i];
+   }  
+}  
 
 void drawSprite8(int numb, int N, int x, int y)
 {
@@ -127,6 +151,13 @@ void reset_game() {
 
 u8 checkCollisions(struct gameCharacter* item1, struct gameItem item) {
   return (item.x >= item1->x && item.x <= item1->x + 16) &&
+  (item.y >= item1->y-16 && item.y <= item1->y + 16) ||
+  (item1->x >= item.x && item1->x <= item.x + 16) &&
+    (item1->y >= item.y-16 && item1->y <= item.y + 16);
+	}
+	
+u8 checkCollisionsOld(struct gameCharacter* item1, struct gameItem item) {
+  return (item.x >= item1->x && item.x <= item1->x + 16) &&
   (item.y >= item1->y-12 && item.y <= item1->y + 4) ||
   (item1->x >= item.x && item1->x <= item.x + 16) &&
     (item.y >= item1->y-12 && item.y <= item1->y + 4);
@@ -153,10 +184,27 @@ void buttonL() {
 } 
 
 void buttonU() {
-   if (cooldownTimer != 0) {return;}
-   cooldownTimer = cooldown;
-   for (int i=0;i<noItems;i++) {
+   
+}
 
+void buttonD() {
+
+}   
+
+void buttonS() { 
+  reset_game();
+}   
+
+void buttonA() {
+   if (player.y < MaxY) {return;}
+   player.y -= 1;
+   player.vy = -jumpheight;
+}  
+
+void buttonB() {
+    if (cooldownTimer != 0) {return;}
+   cooldownTimer = cooldown;
+   for (int i=0;i<currLevel;i++) {
       if (checkCollisions(&spoon, gameItems2[i])) {
          gameItems2[i].vy = -40;
          if (player.dir * gameItems2[i].vx < 0) {
@@ -164,25 +212,8 @@ void buttonU() {
          }   
       countBounce += 1;
    	}
-   }   
-
-}
-
-void buttonD() {
-   reset_game();
-}   
-
-void buttonS() {
-   reset_game();
-}   
-
-void drawSprite(int numb, int N, int x, int y)
-{
-	// Same as CA2, make specific sprite (based on its name/numb) appear on screen, as slide number N (each sprite needs a different, arbitrary, N >= 0)
-    *(unsigned short *)(0x7000000 + 8*N) = y | 0x2000; // atr0 sets y as bits 0-7 and enables 8bpp, 
-    *(unsigned short *)(0x7000002 + 8*N) = x | 0x4000; // atr1 sets x and enables sprite shape 16x16
-    *(unsigned short *)(0x7000004 + 8*N) = numb*8; // atr2
-}
+   }  
+}  
 
 void checkbutton(void)
 {
@@ -191,18 +222,20 @@ void checkbutton(void)
     
     if ((buttons & KEY_A) == KEY_A)
     {
-        // buttonA();
+        buttonA(); // x Key
     }
     if ((buttons & KEY_B) == KEY_B)
     {
-        // buttonB();
+        buttonB(); // z Key
     }if ((buttons & KEY_SELECT) == KEY_SELECT)
     {
         // buttonSel();
     }
     if ((buttons & KEY_START) == KEY_START)
     {
-        buttonS();
+      if (gameMode == 2) {
+        buttonS(); // Enter
+      }  
     }
     if ((buttons & KEY_RIGHT) == KEY_RIGHT)
     {
@@ -218,9 +251,9 @@ void checkbutton(void)
     }
     if ((buttons & KEY_DOWN) == KEY_DOWN)
     {
-        if (gameMode == 2) {
-        buttonD();
-     }   
+        
+        //buttonD();
+  
     }
 }
 
@@ -230,7 +263,7 @@ void gameLogicPs(void) {
    for (int i=0;i<currLevel;i++) {
      // While item is in the air
      if (gameItems2[i].y <= 140 && gameItems2[i].dropped == 0) {
-        gameItems2[i].vy > 30 ? gameItems2[i].vy = 15 : (gameItems2[i].vy += gameItems2[i].a);
+        gameItems2[i].vy > maxItemVy ? gameItems2[i].vy = 15 : (gameItems2[i].vy += gameItems2[i].a);
 	   		gameItems2[i].y += gameItems2[i].vy/5;
 	   		gameItems2[i].x += gameItems2[i].vx/6;
      } else {
@@ -240,6 +273,21 @@ void gameLogicPs(void) {
   	 gameItems2[i].dropped = 1;
     } 
   }  
+  // Iterate over all coins
+  for (int i=0;i<noCoins;i++) {
+    if (checkCollisions(&gameItems2[0], coins[i])){
+      coins[i].x = i*16;
+      coins[i].y = 140;
+      }
+  }
+  // Player logic
+  if (player.y < MaxY) {
+    player.y += player.vy;
+    player.vy += 1;
+  } else {
+    player.y = MaxY;
+  }  
+    
   if (cooldownTimer > 0) {   
     cooldownTimer -= 1;
   }  
@@ -290,18 +338,18 @@ void fillSprites(void)
 } 
 
 void redrawFrame() {
-  for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);} //clear all sprites at the start of every frame;
+  //for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);} //clear all sprites at the start of every frame;
    switch(player.dir) {
       case 1:
          {
             drawSprite(0, 0, player.x, player.y);
-            drawSprite(4, 4, spoon.x, spoon.y);
+            drawSprite(4, 4, spoon.x, player.y-20);
             break;
          }
 		case -1:
 		   {
 			   drawSprite(2, 0, player.x, player.y);
-			   drawSprite(5, 4, spoon.x, spoon.y);
+			   drawSprite(5, 4, spoon.x, player.y-20);
 			   break;
 			}			   
    }
@@ -319,14 +367,32 @@ void redrawFrame() {
    
    
    // Draw items on screen
-   for (int i=0;i<noItems;i++) {
+   for (int i=1;i<noItems;i++) {
     drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);   
    }   
+   // Draw first item as a special item to interact with coins
+   drawSprite(METEOR, 5, gameItems2[0].x, gameItems2[0].y); 
    
+   // Draw coins
+   for (int i=0;i<noCoins;i++) {
+    drawSprite(ROCK_2, i+40, coins[i].x, coins[i].y);   
+   }   
+   
+   // Debug
+   for (int i=0;i<currLevel;i++) {
+        if (checkCollisions(&spoon, gameItems2[i])) {
+          drawSprite(LIFE_1, 95, 100, 100);
+        } else {
+         drawSprite(LIFE_1, 95, 240, 160);
+        }  
+   }  
+
    // Draw cooldown
    if (cooldownTimer > 0) {
-     drawSprite(20, 70, 100, 8);
-   }
+     drawSprite(SATV_1, 70, 100, 8);
+   } else {
+     drawSprite(SATV_1, 70, 240, 160);
+   }  
  }  
 
 

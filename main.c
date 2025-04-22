@@ -50,6 +50,7 @@ int main(void)
 	 init_player(&player);
 	 init_spoon(&spoon); 
    init_items();   
+   init_coins(); //init coinsss
   
     // Set Handler Function for interrupts and enable selected interrupts
     REG_INT = (int)&Handler;
