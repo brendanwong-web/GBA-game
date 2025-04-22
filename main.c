@@ -14,7 +14,9 @@ void Handler(void)
     {
        checkbutton();
        gameLogic();
+       // Check modess
        if (gameMode == PLAY_MODE) {
+         
           redrawFrame();
        }  else if (gameMode == RESET_MODE) {
           drawGameOver();
@@ -48,7 +50,7 @@ int main(void)
     
 	 fillSprites();
 	 fillPalette();
-	 gameMode = PLAY_MODE; // Start game in play mode
+	 gameMode = MENU_MODE; // Start game in play mode
 	 init_player(&player);
 	 init_spoon(&spoon); 
    init_items();   
