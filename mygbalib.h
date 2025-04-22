@@ -137,24 +137,30 @@ void drawGameOver() {
 
 void drawMenu() {
     for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
+    int x = 66;
+    int y = 70;
+    int spacing = 12;
+
+    drawSprite8(TILE_M, 90, x + spacing*0, y); // G
+    drawSprite8(TILE_A, 91, x + spacing*1, y); // A
+    drawSprite8(TILE_M, 92, x + spacing*2, y); // M
+    drawSprite8(TILE_R, 93, x + spacing*3, y); // E
+    drawSprite8(TILE_V, 94, x + spacing*5, y); // O (väli jälkeen E)
+    drawSprite8(TILE_O, 95, x + spacing*6, y); // V
+    drawSprite8(TILE_E, 96, x + spacing*7, y); // E again
+    drawSprite8(TILE_G, 97, x + spacing*8, y); // R
     
+    // press Down to start
 }  
 
 void reset_game() {
    gameMode = PLAY_MODE;
+   for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
    countBounce = 0;
 	 init_player(&player);
 	 //init_item(&pancake, 100, 100, 10, -20);
 	 init_spoon(&spoon);
 	 init_items();
-    drawSprite8(TILE_G, 90, 240, 160); // G
-    drawSprite8(TILE_A, 91, 240, 160); // A
-    drawSprite8(TILE_M, 92, 240, 160); // M
-    drawSprite8(TILE_E, 93, 240, 160); // E
-    drawSprite8(TILE_O, 94, 240, 160); // O (väli jälkeen E)
-    drawSprite8(TILE_V, 95, 240, 160); // V
-    drawSprite8(TILE_E, 96, 240, 160); // E again
-    drawSprite8(TILE_R, 97, 240, 160); // R
 }   
 
 u8 checkCollisions(struct gameCharacter* item1, struct gameItem item) {
@@ -196,7 +202,7 @@ void buttonU() {
 }
 
 void buttonD() {
-
+   gameMode = PLAY_MODE;
 }   
 
 void buttonS() { 
@@ -260,7 +266,7 @@ void checkbutton(void)
     if ((buttons & KEY_DOWN) == KEY_DOWN)
     {
         
-        //buttonD();
+        buttonD();
   
     }
 }
@@ -350,7 +356,7 @@ void fillSprites(void)
 } 
 
 void redrawFrame() {
-  //for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);} //clear all sprites at the start of every frame;
+  for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);} //clear all sprites at the start of every frame;
    switch(player.dir) {
       case 1:
          {
