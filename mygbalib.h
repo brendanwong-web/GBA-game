@@ -220,7 +220,12 @@ void buttonS() {
 }   
 
 void buttonSel() {
-  pause();
+   if (gameMode == PLAY_MODE) {
+       pause();
+   } else {
+     gameMode = PLAY_MODE;
+   }  
+
 }  
 
   
@@ -343,8 +348,10 @@ void gameLogic(void) {
       
       if (checkCollisions(&spoon, gameItems2[i])) {
         collision = i+1;
-      }  
+      }  else {
+        collision = 0;
       } 
+    }  
 }   
 
 
@@ -377,13 +384,13 @@ void redrawFrame() {
       case 1:
          {
             drawSprite(0, 0, player.x, player.y);
-            drawSprite(4, 4, spoon.x, player.y-20);
+            drawSprite(PLATFORM_L, 4, spoon.x, player.y-20);
             break;
          }
 		case -1:
 		   {
 			   drawSprite(2, 0, player.x, player.y);
-			   drawSprite(5, 4, spoon.x, player.y-20);
+			   drawSprite(PLATFORM_R, 4, spoon.x, player.y-20);
 			   break;
 			}			   
    }
@@ -414,7 +421,7 @@ void redrawFrame() {
    
    // Debug
    for (int i=0;i<currLevel;i++) {
-        if (checkCollisions(&spoon, gameItems2[i])) {
+        if (collision != 0) {
           drawSprite(LIFE_1, 95, 100, 0);
         } else {
          drawSprite(LIFE_1, 95, 240, 160);

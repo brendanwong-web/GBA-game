@@ -31,7 +31,7 @@ void Handler(void)
            break ;
          }  
          case PAUSE_MODE: {
-           pause(); //pauses
+           pause(); //pause
            break;
          }  
        }  
@@ -41,12 +41,12 @@ void Handler(void)
     if ((REG_IF & INT_TIMER2) == INT_TIMER2) // TODO: replace XXX with the specific interrupt you are handling
     {
       switch (gameMode) {
-         case PLAY_MODE: {
-          // key_poll();
-           gameLogicPs();
-           break;
-         }  
-         case RESET_MODE: {
+        case PLAY_MODE: {
+          gameLogicPs(); //sts
+        }  
+      }  
+           
+           
     }
     
     
@@ -61,7 +61,7 @@ void Handler(void)
 // -----------------------------------------------------------------------------
 int main(void)
 {   
-    // test comments
+    // test commentrstsrt
  
     *(unsigned short *) 0x4000000 = 0x40 | 0x2 | 0x1000; // Set Mode 2 DO NOT CHANGE!!
     
@@ -80,7 +80,7 @@ int main(void)
     REG_TM1D =	0xDE03;		// Runs game at approx 24fps
     REG_TM1CNT |= TIMER_FREQUENCY_64 | TIMER_ENABLE | TIMER_INTERRUPTS;
     
-    REG_TM2D = 59100;
+    REG_TM2D = 59100; //59100
     REG_TM2CNT |= TIMER_FREQUENCY_256 | TIMER_ENABLE | TIMER_INTERRUPTS; //This timer interrupts every 0.1s
   	 while(1){
      }
