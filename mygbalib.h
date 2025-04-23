@@ -141,16 +141,11 @@ void drawMenu() {
     int y = 70;
     int spacing = 12;
 
-    drawSprite8(TILE_M, 90, x + spacing*0, y); // G
-    drawSprite8(TILE_A, 91, x + spacing*1, y); // A
-    drawSprite8(TILE_M, 92, x + spacing*2, y); // M
-    drawSprite8(TILE_R, 93, x + spacing*3, y); // E
-    drawSprite8(TILE_V, 94, x + spacing*5, y); // O (väli jälkeen E)
-    drawSprite8(TILE_O, 95, x + spacing*6, y); // V
-    drawSprite8(TILE_E, 96, x + spacing*7, y); // E again
-    drawSprite8(TILE_G, 97, x + spacing*8, y); // R
-    
-    // press Down to start
+    drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // G
+    drawSprite8(TILE_MENU_R, 91, x + spacing*1, y); // A
+    drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); // M
+    drawSprite8(TILE_MENU_S, 93, x + spacing*3, y); // E
+    drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); // O (väli jälkeen E)
 }  
 
 void reset_game() {

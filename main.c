@@ -14,7 +14,7 @@ void Handler(void)
     {
        checkbutton();
        gameLogic();
-       // Check modess
+       // Check mode
        if (gameMode == PLAY_MODE) {
          
           redrawFrame();
