@@ -7,11 +7,15 @@ extern int gameMode;
 #define PLAY_MODE       1
 #define RESET_MODE       2
 #define PAUSE_MODE 3
+#define LEVEL_MODE 4
 #define noItems 3
 #define cooldown 10
 #define noCoins 4
 #define jumpheight 6
 #define maxItemVy 20
+
+#define LEVEL_2 6
+
 int cooldownTimer = 0;
 int gameTimer = 0;
 int gameMode;
@@ -165,7 +169,7 @@ void pause() {
 void reset_game() {
    gameMode = PLAY_MODE;
    for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
-   countBounce = 0;
+   gameTimer = 0;
 	 init_player(&player);
 	 //init_item(&pancake, 100, 100, 10, -20);
 	 init_spoon(&spoon);
@@ -208,7 +212,11 @@ void buttonD() {
 }   
 
 void buttonS() { 
+  if (gameMode == RESET_MODE) {
   reset_game();
+  }
+  gameMode = PLAY_MODE;
+
 }   
 
 void buttonSel() {
@@ -258,9 +266,8 @@ void checkbutton(void)
     }
     if ((buttons & KEY_START) == KEY_START)
     {
-      if (gameMode == 2) {
         buttonS(); // Enter
-      }  
+      
     }
     if ((buttons & KEY_RIGHT) == KEY_RIGHT)
     {
@@ -282,6 +289,12 @@ void checkbutton(void)
     }
 }
 
+void nextLevel(int level) {
+  gameMode = LEVEL_MODE;
+  currLevel = level;
+  countBounce = 0;
+  gameTimer = 0;
+}  
 
 void gameLogicPs(void) {
   // Iterate over all coins
@@ -297,6 +310,10 @@ void gameLogicPs(void) {
     cooldownTimer -= 1;
   }  
   gameTimer += 1;
+  
+  if (countBounce > LEVEL_2) {
+   nextLevel(2);
+  }  
 }
 
 void gameLogic(void) {
@@ -310,7 +327,7 @@ void gameLogic(void) {
   	   		gameItems2[i].x += gameItems2[i].vx/6;
        } else {
        // Item dropped
-    	 gameItems2[i].y = 142;
+    	 gameItems2[i].y = MaxY;
     	 gameItems2[i].vx = 0;
     	 gameItems2[i].dropped = 1;
       } 
@@ -424,6 +441,9 @@ void redrawFrame() {
    } else {
      drawSprite(SATV_1, 70, 240, 160);
    }  
+   
+   // Draw level
+   drawSprite8(NUMBERS+currLevel, 75, 60, 8);
  }  
 
 

@@ -18,7 +18,6 @@ void Handler(void)
        switch (gameMode) {
          case PLAY_MODE: {
            for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
-
            redrawFrame();
            gameLogic();
            break;
@@ -32,8 +31,20 @@ void Handler(void)
            break ;
          }  
          case PAUSE_MODE: {
-           pause(); //pausess
+           pause(); //pausesss
            break;
+         }  
+         case LEVEL_MODE: {
+             for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
+               int x = 66;
+              int y = 40;
+              int spacing = 12;
+           drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // G
+            drawSprite8(TILE_MENU_P, 91, x + spacing*1, y); // A
+            drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); // M
+            drawSprite8(TILE_MENU_R, 93, x + spacing*3, y); // E
+            drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); // O (väli jälkeen E)
+            drawSprite8(NUMBERS+currLevel, 95, x + spacing*6, y);
          }  
        }  
 
@@ -42,8 +53,7 @@ void Handler(void)
     if ((REG_IF & INT_TIMER2) == INT_TIMER2) // TODO: replace XXX with the specific interrupt you are handling
     {
       gameLogicPs();
-           
-           
+        
     }
     
     
