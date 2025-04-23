@@ -1,6 +1,6 @@
 #include "sprites.h"
 #define INPUT                      (KEY_MASK & (~REG_KEYS))
-#define MaxY 140
+#define MaxY 120
 extern int gameMode;
 
 #define MENU_MODE        0
@@ -56,9 +56,9 @@ struct gameItem coins[noCoins];
 
 // Init item positions
 int gameItemsx[noItems] = {80, 50, 30};
-int gameItemsy[noItems] = {20, 40, 60};
+int gameItemsy[noItems] = {20, 20, 60};
 int gameItemsvx[noItems] = {10, 5, 20};
-int gameItemsvy[noItems] = {-20, -5, -10};
+int gameItemsvy[noItems] = {-20, -25, -10};
 int gameItemsa[noItems] = {2, 1, 1};
 
 // Init coin positions
@@ -73,7 +73,7 @@ void init_player(struct gameCharacter* player) {
 }
 
 void init_spoon(struct gameItem* spoon) {
-   spoon->x = player.x;
+   spoon->x = player.x+10;
    spoon->y = player.y-20;
    spoon->dropped = 0;
    spoon->vx = 0;
@@ -208,7 +208,7 @@ void buttonU() {
 }
 
 void buttonD() {
-   gameMode = PLAY_MODE;
+  
 }   
 
 void buttonS() { 
@@ -294,6 +294,7 @@ void nextLevel(int level) {
   currLevel = level;
   countBounce = 0;
   gameTimer = 0;
+  init_coins();
 }  
 
 void gameLogicPs(void) {
@@ -321,8 +322,8 @@ void gameLogic(void) {
   
    for (int i=0;i<currLevel;i++) {
        // While item is in the air
-       if (gameItems2[i].y <= 140 && gameItems2[i].dropped == 0) {
-          gameItems2[i].vy > maxItemVy ? gameItems2[i].vy = 15 : (gameItems2[i].vy += gameItems2[i].a);
+       if (gameItems2[i].y <= MaxY && gameItems2[i].dropped == 0) {
+          gameItems2[i].vy > maxItemVy ? gameItems2[i].vy = maxItemVy : (gameItems2[i].vy += gameItems2[i].a);
   	   		gameItems2[i].y += gameItems2[i].vy/6;
   	   		gameItems2[i].x += gameItems2[i].vx/6;
        } else {
@@ -345,12 +346,6 @@ void gameLogic(void) {
   		if (gameItems2[i].dropped == 1) {
         	gameMode = RESET_MODE;
       }  
-      
-      if (checkCollisions(&spoon, gameItems2[i])) {
-        collision = i+1;
-      }  else {
-        collision = 0;
-      } 
     }  
       // Player logic
     if (player.y < MaxY) {
@@ -391,13 +386,13 @@ void redrawFrame() {
       case 1:
          {
             drawSprite(A_R_NF, 0, player.x, player.y);
-            drawSprite(PLATFORM_L, 4, spoon.x, player.y-20);
+            drawSprite(PLATFORM_R, 4, spoon.x, player.y-14);
             break;
          }
 		case -1:
 		   {
 			   drawSprite(A_L_NF, 0, player.x, player.y);
-			   drawSprite(PLATFORM_R, 4, spoon.x, player.y-20);
+			   drawSprite(PLATFORM_L, 4, spoon.x-20, player.y-14);
 			   break;
 			}			   
    }
@@ -428,7 +423,7 @@ void redrawFrame() {
    
    // Debug
    for (int i=0;i<currLevel;i++) {
-        if (collision != 0) {
+        if (checkCollisions(&spoon, gameItems2[i])) {
           drawSprite(LIFE_1, 95, 100, 0);
         } else {
          drawSprite(LIFE_1, 95, 240, 160);

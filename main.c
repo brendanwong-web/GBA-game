@@ -31,7 +31,7 @@ void Handler(void)
            break ;
          }  
          case PAUSE_MODE: {
-           pause(); //pausesss
+           pause(); //pausess
            break;
          }  
          case LEVEL_MODE: {
@@ -45,6 +45,8 @@ void Handler(void)
             drawSprite8(TILE_MENU_R, 93, x + spacing*3, y); // E
             drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); // O (väli jälkeen E)
             drawSprite8(NUMBERS+currLevel, 95, x + spacing*6, y);
+            
+            init_coins();
          }  
        }  
 
@@ -78,7 +80,7 @@ int main(void)
 	 init_player(&player);
 	 init_spoon(&spoon); 
    init_items();   
-   init_coins(); //init coinss
+   init_coins(); //init coinsssssrat
     // Set Handler Function for interrupts and enable selected interrupts
     REG_INT = (int)&Handler;
     REG_IE |= INT_TIMER1 | INT_TIMER2;		// Enable Timer 2
