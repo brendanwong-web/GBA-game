@@ -13,13 +13,14 @@ void Handler(void)
     if ((REG_IF & INT_TIMER1) == INT_TIMER1) // TODO: replace XXX with the specific interrupt you are handling
     {
        checkbutton();
-       gameLogic();
-       // Check modess
+
+       // Check mode
        switch (gameMode) {
          case PLAY_MODE: {
            for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
 
            redrawFrame();
+           gameLogic();
            break;
          }  
          case RESET_MODE: {
@@ -31,7 +32,7 @@ void Handler(void)
            break ;
          }  
          case PAUSE_MODE: {
-           pause(); //pause
+           pause(); //pausess
            break;
          }  
        }  
@@ -40,11 +41,7 @@ void Handler(void)
     
     if ((REG_IF & INT_TIMER2) == INT_TIMER2) // TODO: replace XXX with the specific interrupt you are handling
     {
-      switch (gameMode) {
-        case PLAY_MODE: {
-          gameLogicPs(); //sts
-        }  
-      }  
+      gameLogicPs();
            
            
     }
@@ -61,7 +58,7 @@ void Handler(void)
 // -----------------------------------------------------------------------------
 int main(void)
 {   
-    // test commentrstsrt
+    // test commentrst
  
     *(unsigned short *) 0x4000000 = 0x40 | 0x2 | 0x1000; // Set Mode 2 DO NOT CHANGE!!
     
