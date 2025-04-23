@@ -18,6 +18,7 @@ void Handler(void)
        switch (gameMode) {
          case PLAY_MODE: {
            for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
+
            redrawFrame();
            break;
          }  
@@ -39,8 +40,13 @@ void Handler(void)
     
     if ((REG_IF & INT_TIMER2) == INT_TIMER2) // TODO: replace XXX with the specific interrupt you are handling
     {
-       // key_poll();
-       gameLogicPs();
+      switch (gameMode) {
+         case PLAY_MODE: {
+          // key_poll();
+           gameLogicPs();
+           break;
+         }  
+         case RESET_MODE: {
     }
     
     
