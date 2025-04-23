@@ -80,7 +80,7 @@ void init_spoon(struct gameItem* spoon) {
 void init_item(struct gameItem* item,int x,int y,int vx,int vy) {
    item->vy = vy;
 	item->vx = vx;
-	item->a = 2;
+	item->a = 1;
 	item->x = x;
 	item->y = x;
 	item->dropped = 0;
@@ -151,7 +151,6 @@ void drawMenu() {
 
 void pause() {
     gameMode = PAUSE_MODE;
-    REG_IME = 0x00;
     int x = 66;
     int y = 70;
     int spacing = 12;
@@ -180,13 +179,6 @@ u8 checkCollisions(struct gameCharacter* item1, struct gameItem item) {
     (item1->y >= item.y-16 && item1->y <= item.y + 16);
 	}
 	
-u8 checkCollisionsOld(struct gameCharacter* item1, struct gameItem item) {
-  return (item.x >= item1->x && item.x <= item1->x + 16) &&
-  (item.y >= item1->y-12 && item.y <= item1->y + 4) ||
-  (item1->x >= item.x && item1->x <= item.x + 16) &&
-    (item.y >= item1->y-12 && item.y <= item1->y + 4);
-	}
-
 void buttonR() {
    if (player.x >= 230) {
       return;
@@ -231,9 +223,7 @@ void buttonSel() {
   
 
 void buttonA() {
-   if (player.y < MaxY) {return;}
-   player.y -= 10;
-   player.vy = -jumpheight;
+//implement some function
 }  
 
 void buttonB() {
@@ -294,35 +284,15 @@ void checkbutton(void)
 
 
 void gameLogicPs(void) {
-  // Iterate over all items
-   for (int i=0;i<currLevel;i++) {
-     // While item is in the air
-     if (gameItems2[i].y <= 140 && gameItems2[i].dropped == 0) {
-        gameItems2[i].vy > maxItemVy ? gameItems2[i].vy = 15 : (gameItems2[i].vy += gameItems2[i].a);
-	   		gameItems2[i].y += gameItems2[i].vy/5;
-	   		gameItems2[i].x += gameItems2[i].vx/6;
-     } else {
-     // Item dropped
-  	 gameItems2[i].y = 142;
-  	 gameItems2[i].vx = 0;
-  	 gameItems2[i].dropped = 1;
-    } 
-  }  
   // Iterate over all coins
   for (int i=0;i<noCoins;i++) {
     if (checkCollisions(&gameItems2[0], coins[i])){
       coins[i].x = i*16;
       coins[i].y = 140;
+      countBounce += 3;
       }
   }
-  // Player logic
-  if (player.y < MaxY) {
-    player.y += player.vy;
-    player.vy += 1;
-  } else {
-    player.y = MaxY;
-  }  
-    
+
   if (cooldownTimer > 0) {   
     cooldownTimer -= 1;
   }  
@@ -331,7 +301,20 @@ void gameLogicPs(void) {
 
 void gameLogic(void) {
   // any logic here runs at 24fps
+  
    for (int i=0;i<currLevel;i++) {
+       // While item is in the air
+       if (gameItems2[i].y <= 140 && gameItems2[i].dropped == 0) {
+          gameItems2[i].vy > maxItemVy ? gameItems2[i].vy = 15 : (gameItems2[i].vy += gameItems2[i].a);
+  	   		gameItems2[i].y += gameItems2[i].vy/6;
+  	   		gameItems2[i].x += gameItems2[i].vx/6;
+       } else {
+       // Item dropped
+    	 gameItems2[i].y = 142;
+    	 gameItems2[i].vx = 0;
+    	 gameItems2[i].dropped = 1;
+      } 
+    
      if (gameItems2[i].x >= 224) { //Item bounce off right screen
   		 gameItems2[i].x = 220;
   		 gameItems2[i].vx = -gameItems2[i].vx;
@@ -351,6 +334,13 @@ void gameLogic(void) {
       }  else {
         collision = 0;
       } 
+    }  
+      // Player logic
+    if (player.y < MaxY) {
+      player.y += player.vy;
+      player.vy += 1;
+    } else {
+      player.y = MaxY;
     }  
 }   
 
@@ -383,13 +373,13 @@ void redrawFrame() {
    switch(player.dir) {
       case 1:
          {
-            drawSprite(0, 0, player.x, player.y);
+            drawSprite(A_R_NF, 0, player.x, player.y);
             drawSprite(PLATFORM_L, 4, spoon.x, player.y-20);
             break;
          }
 		case -1:
 		   {
-			   drawSprite(2, 0, player.x, player.y);
+			   drawSprite(A_L_NF, 0, player.x, player.y);
 			   drawSprite(PLATFORM_R, 4, spoon.x, player.y-20);
 			   break;
 			}			   
