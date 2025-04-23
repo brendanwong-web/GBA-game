@@ -6,6 +6,7 @@ extern int gameMode;
 #define MENU_MODE        0
 #define PLAY_MODE       1
 #define RESET_MODE       2
+#define PAUSE_MODE 3
 #define noItems 3
 #define cooldown 10
 #define noCoins 4
@@ -141,10 +142,24 @@ void drawMenu() {
     int y = 70;
     int spacing = 12;
 
+    drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // P
+    drawSprite8(TILE_MENU_R, 91, x + spacing*1, y); // R
+    drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); // E
+    drawSprite8(TILE_MENU_S, 93, x + spacing*3, y); // S
+    drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); // S
+}  
+
+void pause() {
+    gameMode = PAUSE_MODE;
+    REG_IME = 0x00;
+    int x = 66;
+    int y = 70;
+    int spacing = 12;
+
     drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // G
-    drawSprite8(TILE_MENU_R, 91, x + spacing*1, y); // A
+    drawSprite8(TILE_MENU_S, 91, x + spacing*1, y); // A
     drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); // M
-    drawSprite8(TILE_MENU_S, 93, x + spacing*3, y); // E
+    drawSprite8(TILE_MENU_R, 93, x + spacing*3, y); // E
     drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); // O (väli jälkeen E)
 }  
 
@@ -204,6 +219,12 @@ void buttonS() {
   reset_game();
 }   
 
+void buttonSel() {
+  pause();
+}  
+
+  
+
 void buttonA() {
    if (player.y < MaxY) {return;}
    player.y -= 10;
@@ -238,7 +259,7 @@ void checkbutton(void)
         buttonB(); // z Key
     }if ((buttons & KEY_SELECT) == KEY_SELECT)
     {
-        // buttonSel();
+        buttonSel();
     }
     if ((buttons & KEY_START) == KEY_START)
     {
@@ -351,7 +372,7 @@ void fillSprites(void)
 } 
 
 void redrawFrame() {
-  for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);} //clear all sprites at the start of every frame;
+  //for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);} //clear all sprites at the start of every frame;
    switch(player.dir) {
       case 1:
          {

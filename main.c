@@ -14,14 +14,25 @@ void Handler(void)
     {
        checkbutton();
        gameLogic();
-       // Check mode
-       if (gameMode == PLAY_MODE) {
-         
-          redrawFrame();
-       }  else if (gameMode == RESET_MODE) {
-          drawGameOver();
-       }  else if (gameMode == MENU_MODE ){
-         drawMenu();
+       // Check modess
+       switch (gameMode) {
+         case PLAY_MODE: {
+           for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
+           redrawFrame();
+           break;
+         }  
+         case RESET_MODE: {
+           drawGameOver(); 
+           break;
+         }  
+         case MENU_MODE: {
+           drawMenu();
+           break ;
+         }  
+         case PAUSE_MODE: {
+           pause(); //pauses
+           break;
+         }  
        }  
 
     }
