@@ -2,6 +2,22 @@
 
 #define NCOLS 20
 
+void drawSprite(int numb, int N, int x, int y)
+{
+	// Same as CA2, make specific sprite (based on its name/numb) appear on screen, as slide number N (each sprite needs a different, arbitrary, N >= 0)
+    *(unsigned short *)(0x7000000 + 8*N) = y | 0x2000; // atr0 sets y as bits 0-7 and enables 8bpp, 
+    *(unsigned short *)(0x7000002 + 8*N) = x | 0x4000; // atr1 sets x and enables sprite shape 16x16
+    *(unsigned short *)(0x7000004 + 8*N) = numb*8; // atr2
+}
+
+void drawSprite8(int numb, int N, int x, int y)
+{
+    // Gift function: displays sprite number numb on screen at position (x,y), as sprite object N
+    *(unsigned short *)(0x7000000 + 8*N) = y | 0x2000;
+    *(unsigned short *)(0x7000002 + 8*N) = x;
+    *(unsigned short *)(0x7000004 + 8*N) = numb*2;
+}
+
 // RGB palette used for sprites. The sprites defined below use the index of the color in the palette (so black = 0, white = 1, ...)
 int palette[] = {
 RGB(0,0,0), // pure black 0

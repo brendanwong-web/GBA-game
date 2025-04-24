@@ -17,9 +17,9 @@ void Handler(void)
        // Check modess
        switch (gameMode) {
          case PLAY_MODE: {
-           for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
-           redrawFrame();
+           for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);} 
            gameLogic();
+           redrawFrame();
            break;
          }  
          case RESET_MODE: {
@@ -28,10 +28,10 @@ void Handler(void)
          }  
          case MENU_MODE: {
            drawMenu();
-           break ;
+           break;
          }  
          case PAUSE_MODE: {
-           pause(); //pausessssss
+           pause(); //pausessssssss
            break;
          }  
          case LEVEL_MODE: {
@@ -45,8 +45,6 @@ void Handler(void)
             drawSprite8(TILE_MENU_R, 93, x + spacing*3, y); // E
             drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); // O (väli jälkeen E)
             drawSprite8(NUMBERS+currLevel, 95, x + spacing*6, y);
-            
-            init_coins();
          }  
        }  
 
@@ -70,17 +68,17 @@ void Handler(void)
 // -----------------------------------------------------------------------------
 int main(void)
 {   
-    // test commentrst
+    // test commentsssssss
  
     *(unsigned short *) 0x4000000 = 0x40 | 0x2 | 0x1000; // Set Mode 2 DO NOT CHANGE!!
     
 	 fillSprites();
 	 fillPalette();
-	 gameMode = MENU_MODE; // Start game in play mode
-	 init_player(&player);
-	 init_spoon(&spoon); 
-   init_items();   
-   init_coins(); //init coinssss
+	 gameMode = MENU_MODE; // Start game in play modessss
+   init_player(&player);
+	 init_spoon(&spoon);
+	 init_items();
+	 init_coins();
     // Set Handler Function for interrupts and enable selected interrupts
     REG_INT = (int)&Handler;
     REG_IE |= INT_TIMER1 | INT_TIMER2;		// Enable Timer 2

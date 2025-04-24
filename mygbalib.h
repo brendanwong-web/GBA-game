@@ -1,40 +1,14 @@
 #include "sprites.h"
 #define INPUT                      (KEY_MASK & (~REG_KEYS))
+
 #define MaxY 120
-extern int gameMode;
-
-#define MENU_MODE        0
-#define PLAY_MODE       1
-#define RESET_MODE       2
-#define PAUSE_MODE 3
-#define LEVEL_MODE 4
-#define noItems 3
-#define cooldown 10
-
-#define jumpheight 6
-#define maxItemVy 20
-
-#define LEVEL_2 15
-
-// Coins: No coins is based on currLevel
-#define noCoins 4
-int coinsPos[noCoins][2] = {{30,30}, {210, 30}, {50, 50}, {190, 50}};
-struct gameItem coins[noCoins];
-
-int cooldownTimer = 0;
 int gameTimer = 0;
 int gameMode;
 int currLevel = 1;
 int countBounce = 0;
-int collision = 0;
+int collision = -1;
+#define LEVEL_2 5
 
-void drawSprite(int numb, int N, int x, int y)
-{
-	// Same as CA2, make specific sprite (based on its name/numb) appear on screen, as slide number N (each sprite needs a different, arbitrary, N >= 0)
-    *(unsigned short *)(0x7000000 + 8*N) = y | 0x2000; // atr0 sets y as bits 0-7 and enables 8bpp, 
-    *(unsigned short *)(0x7000002 + 8*N) = x | 0x4000; // atr1 sets x and enables sprite shape 16x16
-    *(unsigned short *)(0x7000004 + 8*N) = numb*8; // atr2
-}
 
 typedef struct gameCharacter {
    int x;
@@ -54,26 +28,27 @@ typedef struct gameItem {
    
 };
 
+// Modes
+#define MENU_MODE        0
+#define PLAY_MODE       1
+#define RESET_MODE       2
+#define PAUSE_MODE 3
+#define LEVEL_MODE 4
+
+// Player
 struct gameCharacter player;
-struct gameItem spoon;
-struct gameItem gameItems2[noItems];
-
-
-// Init item positions
-int gameItemsx[noItems] = {80, 50, 30};
-int gameItemsy[noItems] = {20, 20, 60};
-int gameItemsvx[noItems] = {10, 5, 20};
-int gameItemsvy[noItems] = {-20, -25, -10};
-int gameItemsa[noItems] = {2, 1, 1};
-
-
-
+#define jumpheight 6
+#define cooldown 5
+int cooldownTimer = 0;
 void init_player(struct gameCharacter* player) {
    player->x = 100;
    player->y = MaxY;
    player->dir = 1;
 }
+// End Player
 
+// Spoon
+struct gameItem spoon;
 void init_spoon(struct gameItem* spoon) {
    spoon->x = player.x;
    spoon->y = player.y-20;
@@ -82,34 +57,13 @@ void init_spoon(struct gameItem* spoon) {
    spoon->vy = 0;
    spoon->a = 0;
 }
+// End Spoon
 
-void init_item(struct gameItem* item,int x,int y,int vx,int vy) {
-   item->vy = vy;
-	item->vx = vx;
-	item->a = 1;
-	item->x = x;
-	item->y = x;
-	item->dropped = 0;
-}
 
-void init_items() {
-	 for (int i=0;i<=currLevel;i++) {
-	   gameItems2[i].x = gameItemsx[i];
-	   gameItems2[i].y = gameItemsy[i];
-	   gameItems2[i].vx = gameItemsvx[i];
-	   gameItems2[i].vy = gameItemsvy[i];
-	   gameItems2[i].a = gameItemsa[i];
-	   gameItems2[i].dropped = 0;
-	 }
-	 for (int i=currLevel;i<noItems;i++) {
-	   gameItems2[i].x = 240;
-	   gameItems2[i].y = 160;
-	   gameItems2[i].vx = 0;
-	   gameItems2[i].vy = 0;
-	   gameItems2[i].a = 0;
-	   gameItems2[i].dropped = 0;
-	 }   
-} 
+// Coins: No coins is based on currLevel
+#define noCoins 4
+int coinsPos[noCoins][2] = {{30,30}, {210, 30}, {50, 50}, {190, 50}};
+struct gameItem coins[noCoins];
 
 void init_coins() {
    int i;
@@ -124,13 +78,41 @@ void init_coins() {
    }  
 } 
 
-void drawSprite8(int numb, int N, int x, int y)
-{
-    // Gift function: displays sprite number numb on screen at position (x,y), as sprite object N
-    *(unsigned short *)(0x7000000 + 8*N) = y | 0x2000;
-    *(unsigned short *)(0x7000002 + 8*N) = x;
-    *(unsigned short *)(0x7000004 + 8*N) = numb*2;
-}
+// End Coins
+
+// Items:
+#define noItems 3
+#define maxItemVy 20
+struct gameItem gameItems2[noItems];
+// Init item characteristics: [x, y, vx, vy]
+int gameItemsC[noItems][4] = {
+  {80, 30, 10, -10}, // item 0
+  {50, 20, 10, -20}, // item 1
+  {30, 10, 20, 0} // item 2
+  };
+
+void init_items() {
+	 for (int i=0;i<currLevel;i++) {
+	   gameItems2[i].x = gameItemsC[i][0];
+	   gameItems2[i].y = gameItemsC[i][1];
+	   gameItems2[i].vx = gameItemsC[i][2];
+	   gameItems2[i].vy = gameItemsC[i][3];
+	   gameItems2[i].a = 1;
+	   gameItems2[i].dropped = 0;
+	 }
+	 for (int i=currLevel;i<noItems;i++) {
+	   gameItems2[i].x = 240;
+	   gameItems2[i].y = 160;
+	   gameItems2[i].vx = 0;
+	   gameItems2[i].vy = 0;
+	   gameItems2[i].a = 0;
+	   gameItems2[i].dropped = 0;
+	 }   
+} 
+
+// End Items
+
+
 
 void drawGameOver() {
     int x = 66;
@@ -174,13 +156,13 @@ void pause() {
 }  
 
 void reset_game() {
-   gameMode = PLAY_MODE;
    for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
-   gameTimer = 0;
-	 init_player(&player);
-	 //init_item(&pancake, 100, 100, 10, -20);
+   collision = -1;
+   init_player(&player);
 	 init_spoon(&spoon);
+	 init_coins();
 	 init_items();
+	 gameMode = PLAY_MODE;
 }   
 
 u8 checkCollisions(struct gameCharacter* item1, struct gameItem item) {
@@ -215,15 +197,24 @@ void buttonU() {
 }
 
 void buttonD() {
-  
+  switch(gameMode) {
+    case LEVEL_MODE:
+      collision = -1;
+       init_player(&player);
+    	 init_spoon(&spoon);
+    	 init_items();
+    	 init_coins();
+    	 gameMode = PLAY_MODE;
+  }  
 }   
 
 void buttonS() { 
-  if (gameMode == RESET_MODE) {
-  reset_game();
-  }
-  gameMode = PLAY_MODE;
-
+  switch(gameMode) {
+    case MENU_MODE:
+      gameMode = PLAY_MODE;
+    case RESET_MODE:
+      reset_game();
+  }  
 }   
 
 void buttonSel() {
@@ -242,17 +233,15 @@ void buttonA() {
 }  
 
 void buttonB() {
-    if (cooldownTimer != 0) {return;}
-   cooldownTimer = cooldown;
-   if (collision != 0) {
-   for (int i=0;i<currLevel;i++) {
-         gameItems2[collision-1].vy = -40;
-         if (player.dir * gameItems2[collision-1].vx < 0) {
-            gameItems2[collision-1].vx = -gameItems2[collision-1].vx;
-         }   
-      countBounce += 1;
-   	}
-   }  
+   if (cooldownTimer != 0) {return;}
+   if (collision > -1) {
+      gameItems2[collision].vy = -40;
+      if (player.dir * gameItems2[collision-1].vx < 0) {
+        gameItems2[collision].vx = -gameItems2[collision].vx;
+   	     }
+   	  countBounce += 1;
+   }
+    cooldownTimer = cooldown;
 }  
 
 void checkbutton(void)
@@ -301,6 +290,7 @@ void nextLevel(int level) {
   currLevel = level;
   countBounce = 0;
   gameTimer = 0;
+  collision = 0;
   init_coins();
 }  
 
@@ -313,52 +303,63 @@ void gameLogicPs(void) {
       countBounce += 3;
       }
   }
-
+  
   if (cooldownTimer > 0) {   
     cooldownTimer -= 1;
   }  
+  
   gameTimer += 1;
   
-  if (countBounce > LEVEL_2) {
-   nextLevel(2);
+  switch(currLevel) {
+    case 1:
+      if (countBounce > LEVEL_2) {
+        nextLevel(2);
+        break;
+      }  
+    case 2:
+      break;
   }  
+  
 }
 
+// any logic here runs at 24fps
 void gameLogic(void) {
-  // any logic here runs at 24fps
-  
+     // NO IDEA WHY THIS IS THE FIX BUT IT WORKS
+  if (checkCollisions(&spoon, gameItems2[0])) {
+     collision = 0;
+   }  else if (checkCollisions(&spoon, gameItems2[1]))
+   { collision = 1;
+ } else {
+   collision = -1;
+ }    
+ 
    for (int i=0;i<currLevel;i++) {
+
        // While item is in the air
        if (gameItems2[i].y <= MaxY && gameItems2[i].dropped == 0) {
           gameItems2[i].vy > maxItemVy ? gameItems2[i].vy = maxItemVy : (gameItems2[i].vy += gameItems2[i].a);
   	   		gameItems2[i].y += gameItems2[i].vy/6;
-  	   		gameItems2[i].x += gameItems2[i].vx/6;
+  	   		gameItems2[i].x += gameItems2[i].vx/8;
        } else {
        // Item dropped
     	 gameItems2[i].y = MaxY;
     	 gameItems2[i].vx = 0;
     	 gameItems2[i].dropped = 1;
+    	 gameMode = RESET_MODE;
       } 
     
      if (gameItems2[i].x >= 224) { //Item bounce off right screen
   		 gameItems2[i].x = 220;
   		 gameItems2[i].vx = -gameItems2[i].vx;
   		} 
-      else if (gameItems2[i].x <= 0) { //Item bounce off left screen
+     else if (gameItems2[i].x <= 0) { //Item bounce off left screen
   		   gameItems2[i].x = 0;
   		   gameItems2[i].vx = -gameItems2[i].vx;
   		} 
-  		// Check collision
-  		if (checkCollisions(&spoon, gameItems2[i])) {
-  		  collision = i+1;
-  		} else {
-  		  collision = 0;
-  		}  
-  		// Check if item is dropped on the ground
-  		if (gameItems2[i].dropped == 1) {
-        	gameMode = RESET_MODE;
-      }  
+
     }  
+    
+    
       // Player logic
     if (player.y < MaxY) {
       player.y += player.vy;
@@ -401,16 +402,16 @@ void redrawFrame() {
       case 1:
          {
             drawSprite(A_R_NF, 0, player.x, player.y);
-            drawSprite(PLATFORM_R, 4, spoon.x, player.y-14);
+            drawSprite(PLATFORM_R, 1, spoon.x, player.y-14);
             break;
          }
-		case -1:
-		   {
-			   drawSprite(A_L_NF, 0, player.x, player.y);
-			   drawSprite(PLATFORM_L, 4, spoon.x, player.y-14);
-			   break;
-			}			   
-   }
+  		case -1:
+  		   {
+  			   drawSprite(A_L_NF, 0, player.x, player.y);
+  			   drawSprite(PLATFORM_L, 1, spoon.x, player.y-14);
+  			   break;
+  			 }			   
+       }
    // Draw bounce counter
    int res1 = NUMBERS + countBounce%10;
    int res2 = NUMBERS+ countBounce/10;
@@ -437,13 +438,7 @@ void redrawFrame() {
    }   
    
    // Debug
-   for (int i=0;i<currLevel;i++) {
-        if (checkCollisions(&spoon, gameItems2[i])) {
-          drawSprite(collision, 95, 100, 0);
-        } else {
-         drawSprite(collision, 95, 240, 160);
-        }  
-   }  
+   drawSprite8(NUMBERS+collision, 60, 140, 0);
 
    // Draw cooldown
    if (cooldownTimer > 0) {
