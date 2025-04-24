@@ -7,7 +7,8 @@ int gameMode;
 int currLevel = 1;
 int countBounce = 0;
 int collision = -1;
-#define LEVEL_2 5
+#define LEVEL_2 4
+int playerSprite = A_R_NF;
 
 
 typedef struct gameCharacter {
@@ -16,6 +17,7 @@ typedef struct gameCharacter {
    int vx;
    int vy;
    int dir;
+   int frame;
 };
 
 typedef struct gameItem {
@@ -25,7 +27,7 @@ typedef struct gameItem {
    int vy;
    int a;
    int dropped;
-   
+   int frame;
 };
 
 // Modes
@@ -42,10 +44,13 @@ struct gameCharacter player;
 int cooldownTimer = 0;
 #define dash 10
 int dashTimer = 0;
+#define animateFrames 3
+int animateTimer=0;
 void init_player(struct gameCharacter* player) {
    player->x = 100;
    player->y = MaxY;
    player->dir = 1;
+   player->frame = 0;
 }
 // End Player
 
@@ -58,6 +63,7 @@ void init_spoon(struct gameItem* spoon) {
    spoon->vx = 0;
    spoon->vy = 0;
    spoon->a = 0;
+   spoon->frame = 0;
 }
 // End Spoon
 
@@ -69,15 +75,16 @@ struct gameItem coins[noCoins];
 
 void init_coins() {
    int i;
-   int j;
-   for (i=0;i<currLevel*2;i++) {
+   for (i=0;i<noCoins;i++) {
+     if (i<currLevel*2) {
      coins[i].x = coinsPos[i][0];
      coins[i].y = coinsPos[i][1];
-   }  
-   for (j=currLevel*2;j<noCoins;j++){
-     coins[j].x = 240;
-     coins[j].y = 160;
-   }  
+     } else {
+       coins[i].x = 240;
+       coins[i].y = 160;
+     }  
+   coins[i].frame = 0;
+ }  
 } 
 
 // End Coins
@@ -94,22 +101,23 @@ int gameItemsC[noItems][4] = {
   };
 
 void init_items() {
-	 for (int i=0;i<currLevel;i++) {
+	 for (int i=0;i<noItems;i++) {
+	   if (i<currLevel) {
 	   gameItems2[i].x = gameItemsC[i][0];
 	   gameItems2[i].y = gameItemsC[i][1];
 	   gameItems2[i].vx = gameItemsC[i][2];
 	   gameItems2[i].vy = gameItemsC[i][3];
 	   gameItems2[i].a = 1;
-	   gameItems2[i].dropped = 0;
-	 }
-	 for (int i=currLevel;i<noItems;i++) {
-	   gameItems2[i].x = 240;
+	 } else {
+     gameItems2[i].x = 240;
 	   gameItems2[i].y = 160;
 	   gameItems2[i].vx = 0;
 	   gameItems2[i].vy = 0;
-	   gameItems2[i].a = 0;
+	   gameItems2[i].a = 1;
+   }    
 	   gameItems2[i].dropped = 0;
-	 }   
+	   gameItems2[i].frame = 0;
+	 }
 } 
 
 // End Items
@@ -180,7 +188,6 @@ void buttonR() {
    } 
       player.dir  = 1;
       player.x+=2;
-
 }   
 
  
@@ -199,12 +206,7 @@ void buttonU() {
 void buttonD() {
   switch(gameMode) {
     case LEVEL_MODE:
-      collision = -1;
-       init_player(&player);
-    	 init_spoon(&spoon);
-    	 init_items();
-    	 init_coins();
-    	 gameMode = PLAY_MODE;
+      reset_game();
   }  
 }   
 
@@ -226,18 +228,19 @@ void buttonSel() {
 
 }  
 
-  
 
 void buttonA() {
   if (dashTimer != 0) {return;}
      player.x += 10*player.dir;
      dashTimer = dash;
+     player.frame+=1;
 }  
 
 void buttonB() {
    if (cooldownTimer != 0) {return;}
    if (collision > -1) {
       gameItems2[collision].vy = -40;
+      gameItems2[collision].frame += 1;
       if (player.dir * gameItems2[collision].vx < 0) {
         gameItems2[collision].vx = -gameItems2[collision].vx;
    	     }
@@ -306,15 +309,21 @@ void gameLogicPs(void) {
       }
   }
   
+  if ((gameTimer%20) == 0) {
+    coins[0].frame = 1;
+  }  
+  
   if (cooldownTimer > 0) {   
     cooldownTimer -= 1;
   }  
   
   if (dashTimer > 0) {
     dashTimer -= 1;
-  }  
+  }
   
   gameTimer += 1;
+  
+
   
   switch(currLevel) {
     case 1:
@@ -364,16 +373,54 @@ void gameLogic(void) {
   		} 
 
     }  
+    player.x = player.x > 224 ? 224 : player.x;
+    player.x = player.x < 16 ? 16: player.x;
     
-    if (player.x>224) {
-      player.x = 224;
-    } else if (player.x <16){
-      player.x = 16;
-    }  
+    
     // Spoon logic
     spoon.x = player.x + 16*player.dir;
 }   
 
+void animate(int frames) {
+  if (player.frame == 0) {
+    return;
+  } else if (player.frame == frames){
+    player.frame = 0;
+    return;
+  }  
+    player.frame += 1;    
+  return;
+    //drawSprite8(NUMBERS+animateTimer, 30, 100, 100);
+}  
+
+void animateItems(int frames) {
+  int i;
+  for (i=0;i<currLevel;i++){
+    if (gameItems2[i].frame == 0) {
+      break;
+    } else if (gameItems2[i].frame == frames) {
+      gameItems2[i].frame = 0;
+      continue;
+    }  
+    gameItems2[i].frame += 1;
+    
+  }  
+  
+}  
+
+void animateCoins(int frames) {
+    int i;
+  for (i=0;i<noCoins;i++){
+    if (coins[i].frame == 0) {
+      break;
+    } else if (coins[i].frame == frames) {
+      coins[i].frame = 0;
+      continue;
+    }  
+    coins[i].frame += 1;
+    
+  }  
+}  
 
 void fillPalette(void)
 {
@@ -403,13 +450,13 @@ void redrawFrame() {
    switch(player.dir) {
       case 1:
          {
-            drawSprite(A_R_NF, 0, player.x, player.y);
+            drawSprite(A_R_NF+player.frame, 0, player.x, player.y);
             drawSprite(PLATFORM_R, 1, spoon.x, player.y-14);
             break;
          }
   		case -1:
   		   {
-  			   drawSprite(A_L_NF, 0, player.x, player.y);
+  			   drawSprite(A_L_NF+player.frame, 0, player.x, player.y);
   			   drawSprite(PLATFORM_L, 1, spoon.x, player.y-14);
   			   break;
   			 }			   
@@ -429,14 +476,14 @@ void redrawFrame() {
    
    // Draw items on screen
    for (int i=1;i<currLevel;i++) {
-    drawSprite(10, i+50, gameItems2[i].x, gameItems2[i].y);   
+    drawSprite(LIFE_1+gameItems2[i].frame, i+50, gameItems2[i].x, gameItems2[i].y);   
    }   
    // Draw first item as a special item to interact with coins
-   drawSprite(METEOR, 50, gameItems2[0].x, gameItems2[0].y); 
+   drawSprite(METEOR+gameItems2[0].frame, 50, gameItems2[0].x, gameItems2[0].y); 
    
    // Draw coins
    for (int i=0;i<noCoins;i++) {
-    drawSprite(ROCK_2, i+40, coins[i].x, coins[i].y);
+    drawSprite(ROCK_2+coins[i].frame, i+40, coins[i].x, coins[i].y);
    }   
    
    // Debug
