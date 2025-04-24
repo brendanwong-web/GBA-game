@@ -14,7 +14,7 @@ void Handler(void)
     {
        checkbutton();
 
-       // Check mode
+       // Check modess
        switch (gameMode) {
          case PLAY_MODE: {
            for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
@@ -80,7 +80,7 @@ int main(void)
 	 init_player(&player);
 	 init_spoon(&spoon); 
    init_items();   
-   init_coins(); //init coinsssssrat
+   init_coins(); //init coins
     // Set Handler Function for interrupts and enable selected interrupts
     REG_INT = (int)&Handler;
     REG_IE |= INT_TIMER1 | INT_TIMER2;		// Enable Timer 2

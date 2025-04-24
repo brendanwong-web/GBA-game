@@ -11,10 +11,11 @@ extern int gameMode;
 #define noItems 3
 #define cooldown 10
 #define noCoins 4
+#define noCoins1 2
 #define jumpheight 6
 #define maxItemVy 20
 
-#define LEVEL_2 6
+#define LEVEL_2 15
 
 int cooldownTimer = 0;
 int gameTimer = 0;
@@ -64,6 +65,7 @@ int gameItemsa[noItems] = {2, 1, 1};
 // Init coin positions
 int coinsx[noCoins] = {20, 40, 220, 200};
 int coinsy[noCoins] = {20, 40, 60, 80};
+int coins1[noCoins1][2] = {{30,30}, {100, 30}}
 
 
 void init_player(struct gameCharacter* player) {
@@ -73,7 +75,7 @@ void init_player(struct gameCharacter* player) {
 }
 
 void init_spoon(struct gameItem* spoon) {
-   spoon->x = player.x+10;
+   spoon->x = player.x;
    spoon->y = player.y-20;
    spoon->dropped = 0;
    spoon->vx = 0;
@@ -237,8 +239,8 @@ void buttonA() {
 void buttonB() {
     if (cooldownTimer != 0) {return;}
    cooldownTimer = cooldown;
+   if (collision != 0) {
    for (int i=0;i<currLevel;i++) {
-      if (collision != 0) {
          gameItems2[collision-1].vy = -40;
          if (player.dir * gameItems2[collision-1].vx < 0) {
             gameItems2[collision-1].vx = -gameItems2[collision-1].vx;
@@ -341,7 +343,12 @@ void gameLogic(void) {
   		   gameItems2[i].x = 0;
   		   gameItems2[i].vx = -gameItems2[i].vx;
   		} 
-  		
+  		// Check collision
+  		if (checkCollisions(&spoon, gameItems2[i])) {
+  		  collision = i+1;
+  		} else {
+  		  collision = 0;
+  		}  
   		// Check if item is dropped on the ground
   		if (gameItems2[i].dropped == 1) {
         	gameMode = RESET_MODE;
@@ -354,6 +361,9 @@ void gameLogic(void) {
     } else {
       player.y = MaxY;
     }  
+    
+    // Spoon logic
+    spoon.x = player.x + 16*player.dir;
 }   
 
 
@@ -392,7 +402,7 @@ void redrawFrame() {
 		case -1:
 		   {
 			   drawSprite(A_L_NF, 0, player.x, player.y);
-			   drawSprite(PLATFORM_L, 4, spoon.x-20, player.y-14);
+			   drawSprite(PLATFORM_L, 4, spoon.x, player.y-14);
 			   break;
 			}			   
    }
@@ -410,11 +420,11 @@ void redrawFrame() {
    
    
    // Draw items on screen
-   for (int i=1;i<noItems;i++) {
-    drawSprite(10, i+5, gameItems2[i].x, gameItems2[i].y);   
+   for (int i=1;i<currLevel;i++) {
+    drawSprite(10, i+50, gameItems2[i].x, gameItems2[i].y);   
    }   
    // Draw first item as a special item to interact with coins
-   drawSprite(METEOR, 5, gameItems2[0].x, gameItems2[0].y); 
+   drawSprite(METEOR, 50, gameItems2[0].x, gameItems2[0].y); 
    
    // Draw coins
    for (int i=0;i<noCoins;i++) {
@@ -424,9 +434,9 @@ void redrawFrame() {
    // Debug
    for (int i=0;i<currLevel;i++) {
         if (checkCollisions(&spoon, gameItems2[i])) {
-          drawSprite(LIFE_1, 95, 100, 0);
+          drawSprite(collision, 95, 100, 0);
         } else {
-         drawSprite(LIFE_1, 95, 240, 160);
+         drawSprite(collision, 95, 240, 160);
         }  
    }  
 
