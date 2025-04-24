@@ -68,13 +68,13 @@ void Handler(void)
 // -----------------------------------------------------------------------------
 int main(void)
 {   
-    // test commentsssssss
+    // test commentssss
  
     *(unsigned short *) 0x4000000 = 0x40 | 0x2 | 0x1000; // Set Mode 2 DO NOT CHANGE!!
     
 	 fillSprites();
 	 fillPalette();
-	 gameMode = MENU_MODE; // Start game in play modessss
+	 gameMode = MENU_MODE; // Start game in play modesssss
    init_player(&player);
 	 init_spoon(&spoon);
 	 init_items();

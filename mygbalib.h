@@ -40,6 +40,8 @@ struct gameCharacter player;
 #define jumpheight 6
 #define cooldown 5
 int cooldownTimer = 0;
+#define dash 10
+int dashTimer = 0;
 void init_player(struct gameCharacter* player) {
    player->x = 100;
    player->y = MaxY;
@@ -177,8 +179,7 @@ void buttonR() {
       return;
    } 
       player.dir  = 1;
-      player.x++;
-      spoon.x++;
+      player.x+=2;
 
 }   
 
@@ -188,8 +189,7 @@ void buttonL() {
       return;
    } 
    player.dir = -1;
- 	player.x--;
- 	spoon.x--;
+ 	player.x-=2;
 } 
 
 void buttonU() {
@@ -229,14 +229,16 @@ void buttonSel() {
   
 
 void buttonA() {
-//implement some function
+  if (dashTimer != 0) {return;}
+     player.x += 10*player.dir;
+     dashTimer = dash;
 }  
 
 void buttonB() {
    if (cooldownTimer != 0) {return;}
    if (collision > -1) {
       gameItems2[collision].vy = -40;
-      if (player.dir * gameItems2[collision-1].vx < 0) {
+      if (player.dir * gameItems2[collision].vx < 0) {
         gameItems2[collision].vx = -gameItems2[collision].vx;
    	     }
    	  countBounce += 1;
@@ -308,6 +310,10 @@ void gameLogicPs(void) {
     cooldownTimer -= 1;
   }  
   
+  if (dashTimer > 0) {
+    dashTimer -= 1;
+  }  
+  
   gameTimer += 1;
   
   switch(currLevel) {
@@ -359,15 +365,11 @@ void gameLogic(void) {
 
     }  
     
-    
-      // Player logic
-    if (player.y < MaxY) {
-      player.y += player.vy;
-      player.vy += 1;
-    } else {
-      player.y = MaxY;
+    if (player.x>224) {
+      player.x = 224;
+    } else if (player.x <16){
+      player.x = 16;
     }  
-    
     // Spoon logic
     spoon.x = player.x + 16*player.dir;
 }   
@@ -446,6 +448,13 @@ void redrawFrame() {
    } else {
      drawSprite(SATV_1, 70, 240, 160);
    }  
+   
+   if (dashTimer > 0) {
+     drawSprite(SATV_2, 71, 120, 8);
+   } else {
+     drawSprite(SATV_2, 71, 240, 160);
+   }  
+   
    
    // Draw level
    drawSprite8(NUMBERS+currLevel, 75, 60, 8);
