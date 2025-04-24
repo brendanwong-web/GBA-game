@@ -10,12 +10,16 @@ extern int gameMode;
 #define LEVEL_MODE 4
 #define noItems 3
 #define cooldown 10
-#define noCoins 4
-#define noCoins1 2
+
 #define jumpheight 6
 #define maxItemVy 20
 
 #define LEVEL_2 15
+
+// Coins: No coins is based on currLevel
+#define noCoins 4
+int coinsPos[noCoins][2] = {{30,30}, {210, 30}, {50, 50}, {190, 50}};
+struct gameItem coins[noCoins];
 
 int cooldownTimer = 0;
 int gameTimer = 0;
@@ -53,7 +57,7 @@ typedef struct gameItem {
 struct gameCharacter player;
 struct gameItem spoon;
 struct gameItem gameItems2[noItems];
-struct gameItem coins[noCoins];
+
 
 // Init item positions
 int gameItemsx[noItems] = {80, 50, 30};
@@ -62,10 +66,6 @@ int gameItemsvx[noItems] = {10, 5, 20};
 int gameItemsvy[noItems] = {-20, -25, -10};
 int gameItemsa[noItems] = {2, 1, 1};
 
-// Init coin positions
-int coinsx[noCoins] = {20, 40, 220, 200};
-int coinsy[noCoins] = {20, 40, 60, 80};
-int coins1[noCoins1][2] = {{30,30}, {100, 30}}
 
 
 void init_player(struct gameCharacter* player) {
@@ -113,11 +113,16 @@ void init_items() {
 
 void init_coins() {
    int i;
-   for (i=0;i<noCoins;i++) {
-      coins[i].x = coinsx[i];
-      coins[i].y = coinsy[i];
+   int j;
+   for (i=0;i<currLevel*2;i++) {
+     coins[i].x = coinsPos[i][0];
+     coins[i].y = coinsPos[i][1];
    }  
-}  
+   for (j=currLevel*2;j<noCoins;j++){
+     coins[j].x = 240;
+     coins[j].y = 160;
+   }  
+} 
 
 void drawSprite8(int numb, int N, int x, int y)
 {
@@ -428,7 +433,7 @@ void redrawFrame() {
    
    // Draw coins
    for (int i=0;i<noCoins;i++) {
-    drawSprite(ROCK_2, i+40, coins[i].x, coins[i].y);   
+    drawSprite(ROCK_2, i+40, coins[i].x, coins[i].y);
    }   
    
    // Debug

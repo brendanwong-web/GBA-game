@@ -31,7 +31,7 @@ void Handler(void)
            break ;
          }  
          case PAUSE_MODE: {
-           pause(); //pausess
+           pause(); //pausessssss
            break;
          }  
          case LEVEL_MODE: {
@@ -80,7 +80,7 @@ int main(void)
 	 init_player(&player);
 	 init_spoon(&spoon); 
    init_items();   
-   init_coins(); //init coins
+   init_coins(); //init coinssss
     // Set Handler Function for interrupts and enable selected interrupts
     REG_INT = (int)&Handler;
     REG_IE |= INT_TIMER1 | INT_TIMER2;		// Enable Timer 2
