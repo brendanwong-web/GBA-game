@@ -37,6 +37,7 @@ void Handler(void)
                 int x = 50;
                 int y = 60;
                 int spacing = 12;
+                // DIrty but works.
                 if (currLevel==4){
                   drawSprite(WINWIN, 103, 50, 30);
                   drawSprite8(TILE_G, 90, x + spacing*0, y); 
@@ -83,7 +84,7 @@ void Handler(void)
     if ((REG_IF & INT_TIMER3) == INT_TIMER3)
     {
         animate(2);
-        animateItems(1); // animates items
+        animateItems(2); // animates items
         animateCoins(1);
         animateSpoon(1);
         for (int i=0;i<noCoins;i++){
@@ -114,7 +115,7 @@ int main(void)
     
 	 fillSprites();
 	 fillPalette();
-	 gameMode = MENU_MODE; // Start game in play modes
+	 gameMode = MENU_MODE; // Start game in menu modess
    init_player(&player);
 	 init_spoon(&spoon);
 	 init_items();

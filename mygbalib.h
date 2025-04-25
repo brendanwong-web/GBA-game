@@ -1,13 +1,15 @@
 #include "sprites.h"
 #define INPUT                      (KEY_MASK & (~REG_KEYS))
 
-#define MaxY 130
+#define MaxY 130                          // To set floor 
 int gameTimer = 0;
 int gameMode;
 int currLevel = 1;
 int countBounce = 0;
-int collision = -1;
-#define LEVEL_2 10
+int collision = -1;                       // -1 means no item is colliding, 0 means item 0, 
+
+// Level levels
+#define LEVEL_2 10                           
 #define LEVEL_3 20
 #define WIN 30
 
@@ -33,10 +35,10 @@ typedef struct gameItem {
 
 // Modes
 #define MENU_MODE        0
-#define PLAY_MODE       1
+#define PLAY_MODE        1
 #define RESET_MODE       2
-#define PAUSE_MODE 3
-#define LEVEL_MODE 4
+#define PAUSE_MODE       3
+#define LEVEL_MODE       4
 
 // Player
 struct gameCharacter player;
@@ -70,20 +72,26 @@ void init_spoon(struct gameItem* spoon) {
 
 // Coins: No coins is based on currLevel
 #define noCoins 6
-int coinsPos[noCoins][2] = {{20,30}, {220, 30}, {60, 70}, {170, 70}, {50, 100}, {200, 100}};
+int coinsPos[noCoins][2] = {             // Coin init pos given as {x, y}
+  {20,30}, 
+  {220, 30}, 
+  {60, 70}, 
+  {170, 70}, 
+  {50, 100}, 
+  {200, 100}};
 struct gameItem coins[noCoins];
 
 void init_coins() {
    int i;
    for (i=0;i<noCoins;i++) {
-     if (i<currLevel*2) {
+     if (i<currLevel*2) {                   // Coins inc as levels inc
      coins[i].x = coinsPos[i][0];
      coins[i].y = coinsPos[i][1];
      } else {
        coins[i].x = 240;
        coins[i].y = 160;
      }  
-   coins[i].frame = 0;
+   coins[i].frame = 0;                    
  }  
 } 
 
@@ -91,9 +99,10 @@ void init_coins() {
 // End Coins
 
 // Items:
-#define noItems 3
-#define maxItemVy 20
+#define noItems 3                          // To set no. items
+#define maxItemVy 20                       // To clamp item max y velocity
 struct gameItem gameItems2[noItems];
+
 // Init item characteristics: [x, y, vx, vy]
 int gameItemsC[noItems][4] = {
   {80, 30, 10, -10}, // item 0
@@ -103,7 +112,7 @@ int gameItemsC[noItems][4] = {
 
 void init_items() {
 	 for (int i=0;i<noItems;i++) {
-	   if (i<currLevel) {
+	   if (i<currLevel) {                     // Items inc as levels inc
 	   gameItems2[i].x = gameItemsC[i][0];
 	   gameItems2[i].y = gameItemsC[i][1];
 	   gameItems2[i].vx = gameItemsC[i][2];
@@ -185,6 +194,7 @@ void reset_game() {
 	 gameMode = PLAY_MODE;
 }   
 
+// Check Collision function
 u8 checkCollisions(struct gameCharacter* item1, struct gameItem item) {
   return (item.x >= item1->x && item.x <= item1->x + 16) &&
   (item.y >= item1->y-16 && item.y <= item1->y + 16) ||
@@ -233,7 +243,7 @@ void buttonSel() {
    if (gameMode == PLAY_MODE) {
        pause();
    } else {
-      for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
+      for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}  // CLear screen
      gameMode = PLAY_MODE;
    }  
 
@@ -241,24 +251,24 @@ void buttonSel() {
 
 
 void buttonA() {
-  if (dashTimer != 0) {return;}
-     player.x += 30*player.dir;
-     dashTimer = dash;
-     player.frame+=1;
+  if (dashTimer != 0) {return;}                  // If cooldown still active do nothing
+     player.x += 30*player.dir;                  // Dash in direction
+     dashTimer = dash;                           // Init cooldown
+     player.frame+=1;                            // Animate dash
 }  
 
 void buttonB() {
-   if (cooldownTimer != 0) {return;}
-   if (collision > -1) {
-      gameItems2[collision].vy = -40;
-      gameItems2[collision].frame += 1;
-      if (player.dir * gameItems2[collision].vx < 0) {
+   if (cooldownTimer != 0) {return;}             // If cooldown still active do nothing
+   if (collision > -1) {                         // If item is colliding, collision holds the index of the current item being targeted
+      gameItems2[collision].vy = -40;            // Bounce Item
+      gameItems2[collision].frame += 1;          // Animate item
+      if (player.dir * gameItems2[collision].vx < 0) {      // Item should bounce in the direction the player is facing
         gameItems2[collision].vx = -gameItems2[collision].vx;
    	     }
-   	  countBounce += 1;
+   	  countBounce += 1;                          // Update bounce counter
    }
-    cooldownTimer = cooldown;
-    spoon.frame += 1;
+    cooldownTimer = cooldown;                    // Init cooldown
+    spoon.frame += 1;                            // Animate spoon
 }  
 
 void checkbutton(void)
@@ -296,12 +306,11 @@ void checkbutton(void)
     }
     if ((buttons & KEY_DOWN) == KEY_DOWN)
     {
-        
         buttonD();
-  
     }
 }
 
+// Next level logic
 void nextLevel(int level) {
   gameMode = LEVEL_MODE;
   currLevel = level;
@@ -315,6 +324,7 @@ void gameLogicPs(void) {
   // Iterate over all coins
   for (int i=0;i<noCoins;i++) {
     if (checkCollisions(&gameItems2[0], coins[i])){
+      // Coin "Collected", move to holding area
       coins[i].x = 17+i*16;
       coins[i].y = 140;
       countBounce += 3;
@@ -322,6 +332,7 @@ void gameLogicPs(void) {
       
   }
   
+  // Decrement cooldown timers
   if (cooldownTimer > 0) {   
     cooldownTimer -= 1;
   }  
@@ -330,10 +341,11 @@ void gameLogicPs(void) {
     dashTimer -= 1;
   }
   
+  // Increment game timer
   gameTimer += 1;
 
 
-  
+  // Level progression logic
   switch(currLevel) {
     case 1:
       if (countBounce > LEVEL_2) {
@@ -366,16 +378,16 @@ void gameLogic(void) {
  } else {
    collision = -1;
  }    
- 
+   // Iterate over all items based on current Level
    for (int i=0;i<currLevel;i++) {
 
-       // While item is in the air
+       // While item is in the air, do physics
        if (gameItems2[i].y <= MaxY && gameItems2[i].dropped == 0) {
           gameItems2[i].vy > maxItemVy ? gameItems2[i].vy = maxItemVy : (gameItems2[i].vy += gameItems2[i].a);
   	   		gameItems2[i].y += gameItems2[i].vy/6;
   	   		gameItems2[i].x += gameItems2[i].vx/8;
        } else {
-       // Item dropped
+       // Item dropped, stop physics
     	 gameItems2[i].y = MaxY;
     	 gameItems2[i].vx = 0;
     	 gameItems2[i].dropped = 1;
@@ -392,6 +404,8 @@ void gameLogic(void) {
   		} 
 
     }  
+    
+    // Clamp player position to screen dimensions
     player.x = player.x > 224 ? 224 : player.x;
     player.x = player.x < 16 ? 16: player.x;
     
@@ -399,6 +413,8 @@ void gameLogic(void) {
     // Spoon logic
     spoon.x = player.x + 16*player.dir;
 }   
+
+// Animation functions, could definitely be cleande up with more time
 
 void animate(int frames) {
   if (player.frame == 0) {
@@ -422,16 +438,13 @@ void animateSpoon(int frames) {
 
 void animateItems(int frames) {
   int i;
-  for (i=0;i<currLevel;i++){
-    if (gameItems2[i].frame == 0) {
-      continue;
-    } else if (gameItems2[i].frame == frames) {
-      gameItems2[i].frame = 0;
-      continue;
+    if (gameItems2[0].frame == 0) {
+      return;
+    } else if (gameItems2[0].frame == frames) {
+      gameItems2[0].frame = 0;
+      return;
     }  
-    gameItems2[i].frame += 1;
-    
-  }  
+    gameItems2[0].frame += 1;
   
 }  
 void animateCoins(int frames) {
@@ -475,9 +488,7 @@ void fillSprites(void)
 } 
 
 void redrawFrame() {
-  //for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);} //clear all sprites at the start of every frame;
-
-   int textSpacing = 10;
+   // Draw player and spatula sprites based on direction
    switch(player.dir) {
       case 1:
          {
@@ -492,13 +503,16 @@ void redrawFrame() {
   			   break;
   			 }			   
        }
+       
    // Draw bounce counter
    int scorex = 170;
+   int textSpacing = 10;
    drawSprite8(TILE_MENU_S, 98, scorex+textSpacing*0, 7); 
    drawSprite8(TILE_MENU_C, 99, scorex+textSpacing*1, 7); 
    drawSprite8(TILE_MENU_O, 95, scorex+textSpacing*2, 7); 
    drawSprite8(TILE_MENU_R, 96, scorex+textSpacing*3, 7); 
    drawSprite8(TILE_MENU_E, 97, scorex+textSpacing*4, 7); 
+   
    int res1 = NUMBERS + countBounce%10;
    int res2 = NUMBERS+ countBounce/10;
    drawSprite8(res1, 3, scorex + textSpacing*5 + 8, 6);  
@@ -525,6 +539,11 @@ void redrawFrame() {
     drawSprite(COIN+coins[i].frame, 100+i, coins[i].x, coins[i].y);
    }   
    
+   // Draw coin boxes
+   for (int i=0;i<currLevel*2;i++){
+     drawSprite(BOXBOX, 107+i, 16+i*16, 140);
+   }  
+   
    // Debug
    if (collision >-1) {
    drawSprite8(CIRCLE, 19, player.x+4, player.y-20);
@@ -538,6 +557,7 @@ void redrawFrame() {
      drawSprite(SNOWFLAKE, 7, 240, 160);
    }  
    
+   // Draw Dash cooldown
    if (dashTimer > 0) {
      drawSprite(LIGHTNING, 8, 80, 7);
    } else {
@@ -549,9 +569,7 @@ void redrawFrame() {
         drawSprite(TILE_WOOD, 113+i, i*16, 144);
    } 
    
-   for (int i=0;i<currLevel*2;i++){
-     drawSprite(BOXBOX, 107+i, 16+i*16, 140);
-   }  
+
    
    
    // Draw level
