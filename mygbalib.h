@@ -397,7 +397,7 @@ void animateItems(int frames) {
   int i;
   for (i=0;i<currLevel;i++){
     if (gameItems2[i].frame == 0) {
-      break;
+      continue;
     } else if (gameItems2[i].frame == frames) {
       gameItems2[i].frame = 0;
       continue;
@@ -412,7 +412,7 @@ void animateCoins(int frames) {
     int i;
   for (i=0;i<noCoins;i++){
     if (coins[i].frame == 0) {
-      break;
+      continue;
     } else if (coins[i].frame == frames) {
       coins[i].frame = 0;
       continue;
@@ -426,7 +426,8 @@ void fillPalette(void)
 {
     int     i;
 
-	// Fill the palette in GBA memory
+	// Fill the 
+   in GBA memory
     for (i = 0; i < NCOLS; i++)
         spritePal[i] = palette[i];
 }

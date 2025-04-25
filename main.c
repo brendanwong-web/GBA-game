@@ -82,7 +82,7 @@ inline void vsync()
 // -----------------------------------------------------------------------------
 int main(void)
 {   
-    // test commentssss
+    // test comments
  
     REG_DISPCNT = 0x40 | BG1_ENABLE | OBJ_ENABLE; // Set Mode 2 DO NOT CHANGE!!
     
