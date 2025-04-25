@@ -426,24 +426,27 @@ void fillPalette(void)
 {
     int     i;
 
-	// Fill the 
-   in GBA memory
+	// Fill the palette in GBA memory
     for (i = 0; i < NCOLS; i++)
         spritePal[i] = palette[i];
+        bgPal[i] = palette[i];     
 }
 
 
 void fillSprites(void)
 {
     int     i;
+    int     j;
 
 	// Load all sprites in GBA memory
-    for (i = 0; i < 128*16*16; i++)
-        spriteData[i] = (sprites[i*2+1] << 8) + sprites[i*2];
+    for (i = 0; i < 128*16*16; i++) {
+        spriteData[i] = (sprites[i*2+1] << 8) + sprites[i*2];      
+    }  
 
 	// draw all sprites on screen, but all of them outside of the screen (starting at position (240,160) the bottom right corner of the GBA screen)
-    for(i = 0; i < 128; i++)
+    for(i = 0; i < 128; i++) {
         drawSprite(0, i, 240,160);
+    }  
 } 
 
 void redrawFrame() {

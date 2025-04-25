@@ -28,10 +28,10 @@ typedef unsigned int word;
 // memory register defines
 #define OAM_MEM_START        0x7000000
 #define VRAM_START           0x6000000
-#define BG_RAM_START         0x6000000
-#define OBJ_RAM_START        0x6010000
-#define BG_PALETTE_MEM       0x5000000
-#define OBJ_PALETTE_MEM      0x5000200
+#define BG_RAM_START         0x6000000 //bg data
+#define OBJ_RAM_START        0x6010000 //spritedata
+#define BG_PALETTE_MEM       0x5000000 //bgPal
+#define OBJ_PALETTE_MEM      0x5000200 //spritePal
 
 // buffer defines
 #define FRONT_BUFFER         (u16*)0x6000000
@@ -271,6 +271,8 @@ typedef void (*fp)(void);
 #define SCANLINE_COUNTER           (*(volatile u16*)0x4000006)
 #define INPUT                      (KEY_MASK & (~REG_KEYS))
 #define spriteData                 ((unsigned short *) 0x6010000)
+#define bgData                     ((unsigned short *) 0x6000000)
 #define spritePal                  ((unsigned short *) 0x5000200)
+#define bgPal                      ((unsigned short *) 0x5000000)
 #define REG_INT                    (*(unsigned int*)0x3007FFC)
 #endif

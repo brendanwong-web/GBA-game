@@ -1,6 +1,6 @@
 #include "gba.h"
 
-#define NCOLS 20
+#define NCOLS 21
 
 void drawSprite(int numb, int N, int x, int y)
 {
@@ -37,7 +37,7 @@ RGB(27,0,0), // dark red 13
 RGB(0,16,0), // darkest green 14
 RGB(0,31,0), // pure green 15
 RGB(16,31,16), // light green 16
-RGB(23,31,23) // lightest green 17
+RGB(23,31,23), // lightest green 17
 RGB(27,20,10), // light brown 18
 };
 
@@ -168,7 +168,7 @@ u16 sprites[] = {
 0,0,0,0,0,0,0,0,  
 
 
-#define CHEF_L 1 CHEF_R+3
+#define CHEF_L CHEF_R+3
 // Tile 00
 0,0,0,0,0,0,0,0,  
 0,0,0,0,1,1,1,1,  
