@@ -38,10 +38,10 @@ void Handler(void)
                     int x = 50;
                     int y = 60;
                     int spacing = 12;
-                        drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // P
-                        drawSprite8(TILE_MENU_R, 91, x + spacing*1, y); // R
-                        drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); // E
-                        drawSprite8(TILE_MENU_S, 93, x + spacing*3, y); // S
+                        drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); 
+                        drawSprite8(TILE_MENU_R, 91, x + spacing*1, y); 
+                        drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); 
+                        drawSprite8(TILE_MENU_S, 93, x + spacing*3, y); 
                         drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); 
                       
                         drawSprite8(TILE_MENU_D, 104, x + spacing*6, y); 

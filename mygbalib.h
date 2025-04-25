@@ -352,7 +352,7 @@ void gameLogic(void) {
 
        // While item is in the air
        if (gameItems2[i].y <= MaxY && gameItems2[i].dropped == 0) {
-          gameItems2[i].vy > maxItemVy ? gameItems2[i].vy = maxItemVy : (gameItems2[i].vy += gameItems2[i].a);
+          gameItems2[i].vy = (gameItems2[i].vy < maxItemVy) ? maxItemVy : (gameItems2[i].vy += gameItems2[i].a);
   	   		gameItems2[i].y += gameItems2[i].vy/6;
   	   		gameItems2[i].x += gameItems2[i].vx/8;
        } else {
@@ -373,6 +373,8 @@ void gameLogic(void) {
   		} 
 
     }  
+    
+    // Player logic
     player.x = player.x > 224 ? 224 : player.x;
     player.x = player.x < 16 ? 16: player.x;
     
@@ -468,42 +470,38 @@ void redrawFrame() {
    // Draw bounce counter
    int res1 = NUMBERS + countBounce%10;
    int res2 = NUMBERS+ countBounce/10;
-   drawSprite8(res1, 25, 232-8, 8);  
    drawSprite8(res2, 26, 232-16, 8);  
    
   // Draw game timer
    int dig1 = NUMBERS + (gameTimer/10)%10;
    int dig2 = NUMBERS+ gameTimer/100;
-   drawSprite8(dig1, 27, 200-8, 8);  
    drawSprite8(dig2, 28, 200-16, 8);  
+   drawSprite8(dig2, 5, 200-16, 8);  
    
    
    // Draw items on screen
    for (int i=1;i<currLevel;i++) {
-    drawSprite(PANCAKE+gameItems2[i].frame, i+50, gameItems2[i].x, gameItems2[i].y);   
+    drawSprite(PANCAKE+gameItems2[i].frame, i+10, gameItems2[i].x, gameItems2[i].y);   
    }   
    // Draw first item as a special item to interact with coins
-   drawSprite(EGG+gameItems2[0].frame, 50, gameItems2[0].x, gameItems2[0].y); 
+   drawSprite(EGG+gameItems2[0].frame, 10, gameItems2[0].x, gameItems2[0].y); 
    
    // Draw coins
    for (int i=0;i<noCoins;i++) {
-    drawSprite(COIN+coins[i].frame, i+10, coins[i].x, coins[i].y);
+    drawSprite(COIN+coins[i].frame, i+20, coins[i].x, coins[i].y);
    }   
    
    // Debug
-   drawSprite8(NUMBERS+collision, 60, 140, 0);
 
    // Draw cooldown
    if (cooldownTimer > 0) {
-     drawSprite(SNOWFLAKE, 70, 100, 8);
    } else {
-     drawSprite(SNOWFLAKE, 70, 240, 160);
    }  
    
    if (dashTimer > 0) {
-     drawSprite(SNOWFLAKE, 71, 120, 8);
+     drawSprite(SNOWFLAKE, 7, 120, 8);
    } else {
-     drawSprite(SNOWFLAKE, 71, 240, 160);
+     drawSprite(SNOWFLAKE, 7, 240, 160);
    }  
    
    // draw floor
