@@ -106,7 +106,7 @@ void init_items() {
 	   gameItems2[i].y = gameItemsC[i][1];
 	   gameItems2[i].vx = gameItemsC[i][2];
 	   gameItems2[i].vy = gameItemsC[i][3];
-	   gameItems2[i].a = 1;
+	   gameItems2[i].a = 0;
 	 } else {
      gameItems2[i].x = 240;
 	   gameItems2[i].y = 160;
@@ -494,16 +494,19 @@ void redrawFrame() {
 
    // Draw cooldown
    if (cooldownTimer > 0) {
-     drawSprite(COIN, 70, 100, 8);
+     drawSprite(SNOWFLAKE, 70, 100, 8);
    } else {
-     drawSprite(COIN, 70, 240, 160);
+     drawSprite(SNOWFLAKE, 70, 240, 160);
    }  
    
    if (dashTimer > 0) {
-     drawSprite(COIN, 71, 120, 8);
+     drawSprite(SNOWFLAKE, 71, 120, 8);
    } else {
-     drawSprite(COIN, 71, 240, 160);
+     drawSprite(SNOWFLAKE, 71, 240, 160);
    }  
+   
+   // draw floor
+   drawSprite(TILE_WOOD, 60, 0, 144);
    
    
    // Draw level

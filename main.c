@@ -70,7 +70,7 @@ void Handler(void)
     }
 
     REG_IF = REG_IF; // Acknowledge interrupts
-    REG_IME = 0x01;  // Re-enable interrupts
+    REG_IME = 0x01;  // Re-enable interruptssss
 }
 
 inline void vsync()
@@ -102,13 +102,13 @@ int main(void)
     REG_IME = 0x01;		// Enable interrupt handling
     
     // Set Timer Mode (fill that section and replace TMX with selected timer number)
-    REG_TM1D =	0xDE03;		// Runs game at approx 24fps
+    REG_TM1D =	0xDE03;		// Runs game at approx 24fpsssssssss
     REG_TM1CNT |= TIMER_FREQUENCY_64 | TIMER_ENABLE | TIMER_INTERRUPTS;
     
     REG_TM2D = 59100; //59100
     REG_TM2CNT |= TIMER_FREQUENCY_256 | TIMER_ENABLE | TIMER_INTERRUPTS; //This timer interrupts every 0.1s
     
-    REG_TM3D = 60535; //59100
+    REG_TM3D = 40535; //59100
     REG_TM3CNT |= TIMER_FREQUENCY_1024 | TIMER_ENABLE | TIMER_INTERRUPTS; //This timer interrupts every 0.1s
     
   	 while(1){
