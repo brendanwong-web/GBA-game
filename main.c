@@ -29,7 +29,7 @@ void Handler(void)
                 break;
 
             case PAUSE_MODE:
-                pause(); //pauses
+                pause(); //pausess
                 break;
 
             case LEVEL_MODE:

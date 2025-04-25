@@ -8,7 +8,6 @@ int currLevel = 1;
 int countBounce = 0;
 int collision = -1;
 #define LEVEL_2 4
-int playerSprite = A_R_NF;
 
 
 typedef struct gameCharacter {
@@ -454,14 +453,14 @@ void redrawFrame() {
    switch(player.dir) {
       case 1:
          {
-            drawSprite(A_R_NF+player.frame, 0, player.x, player.y);
-            drawSprite(PLATFORM_R, 1, spoon.x, player.y-14);
+            drawSprite(CHEF_R+player.frame, 0, player.x, player.y);
+            drawSprite(SPOON_R, 1, spoon.x, player.y-14);
             break;
          }
   		case -1:
   		   {
-  			   drawSprite(A_L_NF+player.frame, 0, player.x, player.y);
-  			   drawSprite(PLATFORM_L, 1, spoon.x, player.y-14);
+  			   drawSprite(CHEF_L+player.frame, 0, player.x, player.y);
+  			   drawSprite(SPOON_L, 1, spoon.x, player.y-14);
   			   break;
   			 }			   
        }
@@ -480,14 +479,14 @@ void redrawFrame() {
    
    // Draw items on screen
    for (int i=1;i<currLevel;i++) {
-    drawSprite(LIFE_1+gameItems2[i].frame, i+50, gameItems2[i].x, gameItems2[i].y);   
+    drawSprite(PANCAKE+gameItems2[i].frame, i+50, gameItems2[i].x, gameItems2[i].y);   
    }   
    // Draw first item as a special item to interact with coins
-   drawSprite(METEOR+gameItems2[0].frame, 50, gameItems2[0].x, gameItems2[0].y); 
+   drawSprite(EGG+gameItems2[0].frame, 50, gameItems2[0].x, gameItems2[0].y); 
    
    // Draw coins
    for (int i=0;i<noCoins;i++) {
-    drawSprite(ROCK_2+coins[i].frame, i+40, coins[i].x, coins[i].y);
+    drawSprite(COIN+coins[i].frame, i+40, coins[i].x, coins[i].y);
    }   
    
    // Debug
@@ -495,15 +494,15 @@ void redrawFrame() {
 
    // Draw cooldown
    if (cooldownTimer > 0) {
-     drawSprite(SATV_1, 70, 100, 8);
+     drawSprite(COIN, 70, 100, 8);
    } else {
-     drawSprite(SATV_1, 70, 240, 160);
+     drawSprite(COIN, 70, 240, 160);
    }  
    
    if (dashTimer > 0) {
-     drawSprite(SATV_2, 71, 120, 8);
+     drawSprite(COIN, 71, 120, 8);
    } else {
-     drawSprite(SATV_2, 71, 240, 160);
+     drawSprite(COIN, 71, 240, 160);
    }  
    
    
