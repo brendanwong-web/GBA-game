@@ -1,0 +1,30 @@
+Instructions
+
+Game Title: Chef's Flipendos
+
+Welcome to Chef's Flipendos
+Here’s how to play:
+
+Controls:
+
+Left/Right Arrows — Move the chef left and right.
+A Button — Swing the spatula to flip the food (egg or pancake).
+B Button — Dash quickly left or right.
+Start Button — Restart the game after it ends.
+Gameplay:
+
+Level 1: Flip the egg in the air with the spatula (A button).
+Each bounce = +1 point.
+Catch a coin with the egg = +3 points.
+Goal: Reach 10 points to unlock Level 2.
+
+Level 2: Keep both an egg and a pancake bouncing.
+Coins can only be collected with the egg!
+Don't let anything fall to the ground.
+Goal: Reach 20 points to unlock Level 3.
+
+Level 3: Keep bouncing and earn points!
+Goal: Reach a total of 30 points to win the game.
+Losing:
+
+If the egg or pancake touches the ground at any time, you lose!
