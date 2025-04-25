@@ -822,7 +822,7 @@ u16 sprites[] = {
 
 // 8x8 sprites
 
-#define TILE_G 36
+#define TILE_G 38
 //G
 6,6,6,6,6,6,6,6,
 6,0,0,0,0,0,0,0,

@@ -34,10 +34,17 @@ void Handler(void)
 
             case LEVEL_MODE:
                 for(int j = 0; j < 128; j++){drawSprite(0, j, 240, 160);}
-                                {
-                    int x = 50;
-                    int y = 60;
-                    int spacing = 12;
+                int x = 50;
+                int y = 60;
+                int spacing = 12;
+                if (currLevel==4){
+                  drawSprite(WINWIN, 103, 50, 30);
+                  drawSprite8(TILE_G, 90, x + spacing*0, y); 
+                  drawSprite8(TILE_MENU_O, 91, x + spacing*1, y); 
+                  drawSprite8(TILE_MENU_O, 92, x + spacing*2, y); 
+                  drawSprite8(TILE_MENU_D, 93, x + spacing*3, y); 
+                }  else {
+                    
                         drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); 
                         drawSprite8(TILE_MENU_R, 91, x + spacing*1, y); 
                         drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); 
@@ -55,7 +62,7 @@ void Handler(void)
                         drawSprite8(TILE_MENU_E, 102, x + spacing*3, y+20);
                         drawSprite8(TILE_MENU_L, 103, x + spacing*4, y+20); 
                         drawSprite8(NUMBERS + currLevel, 95, x + spacing*6, y+20);
-                }
+                  }  
                 break;
         }
     }
@@ -76,9 +83,9 @@ void Handler(void)
     if ((REG_IF & INT_TIMER3) == INT_TIMER3)
     {
         animate(2);
-        animateItems(1); // animates itemss
+        animateItems(1); // animates itemssss
         animateCoins(1);
-        //animateSpoon(1);
+        animateSpoon(1);
     }
 
     REG_IF = REG_IF; // Acknowledge interrupts
