@@ -29,21 +29,32 @@ void Handler(void)
                 break;
 
             case PAUSE_MODE:
-                pause(); //pausess
+                pause(); //pauses
                 break;
 
             case LEVEL_MODE:
                 for(int j = 0; j < 128; j++){drawSprite(0, j, 240, 160);}
-                {
-                    int x = 66;
-                    int y = 40;
+                                {
+                    int x = 50;
+                    int y = 60;
                     int spacing = 12;
-                    drawSprite8(TILE_MENU_P, 90, x + spacing*0, y);
-                    drawSprite8(TILE_MENU_P, 91, x + spacing*1, y);
-                    drawSprite8(TILE_MENU_E, 92, x + spacing*2, y);
-                    drawSprite8(TILE_MENU_R, 93, x + spacing*3, y);
-                    drawSprite8(TILE_MENU_S, 94, x + spacing*4, y);
-                    drawSprite8(NUMBERS + currLevel, 95, x + spacing*6, y);
+                        drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // P
+                        drawSprite8(TILE_MENU_R, 91, x + spacing*1, y); // R
+                        drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); // E
+                        drawSprite8(TILE_MENU_S, 93, x + spacing*3, y); // S
+                        drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); 
+                      
+                        drawSprite8(TILE_MENU_D, 104, x + spacing*6, y); 
+                        drawSprite8(TILE_MENU_O, 96, x + spacing*7, y);
+                        drawSprite8(TILE_MENU_W, 97, x + spacing*8, y); 
+                        drawSprite8(TILE_MENU_N, 98, x + spacing*9, y); 
+                        
+                        drawSprite8(TILE_MENU_L, 99, x + spacing*0, y+20); 
+                        drawSprite8(TILE_MENU_E, 100, x + spacing*1, y+20);
+                        drawSprite8(TILE_MENU_V, 101, x + spacing*2, y+20); 
+                        drawSprite8(TILE_MENU_E, 102, x + spacing*3, y+20);
+                        drawSprite8(TILE_MENU_L, 103, x + spacing*4, y+20); 
+                        drawSprite8(NUMBERS + currLevel, 95, x + spacing*6, y+20);
                 }
                 break;
         }
@@ -64,9 +75,10 @@ void Handler(void)
 
     if ((REG_IF & INT_TIMER3) == INT_TIMER3)
     {
-        animate(3);
-        animateItems(3); // animates items
-        animateCoins(2);
+        animate(2);
+        animateItems(1); // animates items
+        animateCoins(1);
+        //animateSpoon(1);
     }
 
     REG_IF = REG_IF; // Acknowledge interrupts
@@ -102,13 +114,13 @@ int main(void)
     REG_IME = 0x01;		// Enable interrupt handling
     
     // Set Timer Mode (fill that section and replace TMX with selected timer number)
-    REG_TM1D =	0xDE03;		// Runs game at approx 24fpsssssssss
+    REG_TM1D =	0xDE03;		// Runs game at approx 24fpss
     REG_TM1CNT |= TIMER_FREQUENCY_64 | TIMER_ENABLE | TIMER_INTERRUPTS;
     
     REG_TM2D = 59100; //59100
     REG_TM2CNT |= TIMER_FREQUENCY_256 | TIMER_ENABLE | TIMER_INTERRUPTS; //This timer interrupts every 0.1s
     
-    REG_TM3D = 40535; //59100
+    REG_TM3D = 60535; //sttsssssss
     REG_TM3CNT |= TIMER_FREQUENCY_1024 | TIMER_ENABLE | TIMER_INTERRUPTS; //This timer interrupts every 0.1s
     
   	 while(1){

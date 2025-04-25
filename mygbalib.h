@@ -94,9 +94,9 @@ void init_coins() {
 struct gameItem gameItems2[noItems];
 // Init item characteristics: [x, y, vx, vy]
 int gameItemsC[noItems][4] = {
-  {80, 30, 10, -10}, // item 0
-  {50, 20, 10, -20}, // item 1
-  {30, 10, 20, 0} // item 2
+  {80, 30, 10, -10, 1}, // item 0
+  {50, 20, 10, -20, 2}, // item 1
+  {80, 30, 20, -30, 1} // item 2
   };
 
 void init_items() {
@@ -237,6 +237,7 @@ void buttonA() {
 
 void buttonB() {
    if (cooldownTimer != 0) {return;}
+   spoon.frame += 1;
    if (collision > -1) {
       gameItems2[collision].vy = -40;
       gameItems2[collision].frame += 1;
@@ -486,7 +487,7 @@ void redrawFrame() {
    
    // Draw coins
    for (int i=0;i<noCoins;i++) {
-    drawSprite(COIN+coins[i].frame, i+40, coins[i].x, coins[i].y);
+    drawSprite(COIN+coins[i].frame, i+10, coins[i].x, coins[i].y);
    }   
    
    // Debug
