@@ -6,68 +6,71 @@
 #include "gba.h"
 #include "mygbalib.h"
 
-
 void Handler(void)
 {
     REG_IME = 0x00; // Stop all other interrupt handling, while we handle this current one
     
-    if ((REG_IF & INT_TIMER1) == INT_TIMER1) // TODO: replace XXX with the specific interrupt you are handling
+    if ((REG_IF & INT_TIMER1) == INT_TIMER1)
     {
-       checkbutton();
+        checkbutton();
+		
+        switch (gameMode) {
+            case PLAY_MODE:
+                gameLogic();
+                redrawFrame();
+                break;
 
-       // Check modesss
-       switch (gameMode) {
-         case PLAY_MODE: {
-           
-           gameLogic();
-           redrawFrame();
-           break;
-         }  
-         case RESET_MODE: {
-           drawGameOver(); 
-           break;
-         }  
-         case MENU_MODE: {
-           drawMenu();
-           break;
-         }  
-         case PAUSE_MODE: {
-           pause(); //pausessssssss
-           break;
-         }  
-         case LEVEL_MODE: {
-             for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
-               int x = 66;
-              int y = 40;
-              int spacing = 12;
-           drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // G
-            drawSprite8(TILE_MENU_P, 91, x + spacing*1, y); // A
-            drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); // M
-            drawSprite8(TILE_MENU_R, 93, x + spacing*3, y); // E
-            drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); // O (väli jälkeen E)s
-            drawSprite8(NUMBERS+currLevel, 95, x + spacing*6, y);
-         }  
-       }  
+            case RESET_MODE:
+                drawGameOver(); 
+                break;
 
+            case MENU_MODE:
+                drawMenu();
+                break;
+
+            case PAUSE_MODE:
+                pause(); //pauses
+                break;
+
+            case LEVEL_MODE:
+                for(int j = 0; j < 128; j++){drawSprite(0, j, 240, 160);}
+                {
+                    int x = 66;
+                    int y = 40;
+                    int spacing = 12;
+                    drawSprite8(TILE_MENU_P, 90, x + spacing*0, y);
+                    drawSprite8(TILE_MENU_P, 91, x + spacing*1, y);
+                    drawSprite8(TILE_MENU_E, 92, x + spacing*2, y);
+                    drawSprite8(TILE_MENU_R, 93, x + spacing*3, y);
+                    drawSprite8(TILE_MENU_S, 94, x + spacing*4, y);
+                    drawSprite8(NUMBERS + currLevel, 95, x + spacing*6, y);
+                }
+                break;
+        }
     }
-    
-    if ((REG_IF & INT_TIMER2) == INT_TIMER2) // TODO: replace XXX with the specific interrupt you are handling
+
+    if ((REG_IF & INT_TIMER2) == INT_TIMER2)
     {
-      gameLogicPs();
-        
+        // Inline assembly to increment gameTimer
+        __asm__ volatile (
+            "ldr r0, =gameTimer\n\t"   // Load address of gameTimer into r0
+            "ldr r1, [r0]\n\t"         // Load current value of gameTimer into r1
+            "add r1, r1, #1\n\t"       // Increment r1 by 1
+            "str r1, [r0]\n\t"         // Store new value back to gameTimer
+        );
+
+        gameLogicPs();
     }
-    
-    if ((REG_IF & INT_TIMER3) == INT_TIMER3) // TODO: replace XXX with the specific interrupt you are handling
+
+    if ((REG_IF & INT_TIMER3) == INT_TIMER3)
     {
-      animate(3);
-      animateItems(3); // animates itemsss
-      animateCoins(2);
+        animate(3);
+        animateItems(3); // animates items
+        animateCoins(2);
     }
-    
-    
-    REG_IF = REG_IF; // Update interrupt table, to confirm we have handled this interrupt
-    
-    REG_IME = 0x01;  // Re-enable interrupt handlingssssss
+
+    REG_IF = REG_IF; // Acknowledge interrupts
+    REG_IME = 0x01;  // Re-enable interrupts
 }
 
 inline void vsync()
