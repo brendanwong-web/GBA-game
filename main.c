@@ -29,7 +29,7 @@ void Handler(void)
                 break;
 
             case PAUSE_MODE:
-                pause(); //pauses
+                pause(); 
                 break;
 
             case LEVEL_MODE:
@@ -70,7 +70,7 @@ void Handler(void)
 
     if ((REG_IF & INT_TIMER2) == INT_TIMER2)
     {
-        // Inline assembly to increment gameTimer
+        // Inline assembly to increment gameTimerss
         __asm__ volatile (
             "ldr r0, =gameTimer\n\t"   // Load address of gameTimer into r0
             "ldr r1, [r0]\n\t"         // Load current value of gameTimer into r1
@@ -84,7 +84,7 @@ void Handler(void)
     if ((REG_IF & INT_TIMER3) == INT_TIMER3)
     {
         animate(2);
-        animateItems(2); // animates items
+        animateItems(1);
         animateCoins(1);
         animateSpoon(1);
         for (int i=0;i<noCoins;i++){
