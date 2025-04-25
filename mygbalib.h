@@ -1,13 +1,15 @@
 #include "sprites.h"
 #define INPUT                      (KEY_MASK & (~REG_KEYS))
 
-#define MaxY 120
+#define MaxY 130
 int gameTimer = 0;
 int gameMode;
 int currLevel = 1;
 int countBounce = 0;
 int collision = -1;
 #define LEVEL_2 4
+#define LEVEL_3 6
+#define WIN 20
 
 
 typedef struct gameCharacter {
@@ -94,9 +96,9 @@ void init_coins() {
 struct gameItem gameItems2[noItems];
 // Init item characteristics: [x, y, vx, vy]
 int gameItemsC[noItems][4] = {
-  {80, 30, 10, -10, 1}, // item 0
-  {50, 20, 10, -20, 2}, // item 1
-  {80, 30, 20, -30, 1} // item 2
+  {80, 30, 10, -10}, // item 0
+  {50, 20, 10, -20}, // item 1
+  {30, 10, -10, -30} // item 2
   };
 
 void init_items() {
@@ -106,13 +108,13 @@ void init_items() {
 	   gameItems2[i].y = gameItemsC[i][1];
 	   gameItems2[i].vx = gameItemsC[i][2];
 	   gameItems2[i].vy = gameItemsC[i][3];
-	   gameItems2[i].a = 0;
+	   gameItems2[i].a = 1;
 	 } else {
      gameItems2[i].x = 240;
 	   gameItems2[i].y = 160;
 	   gameItems2[i].vx = 0;
 	   gameItems2[i].vy = 0;
-	   gameItems2[i].a = 1;
+	   gameItems2[i].a = 0;
    }    
 	   gameItems2[i].dropped = 0;
 	   gameItems2[i].frame = 0;
@@ -132,7 +134,7 @@ void drawGameOver() {
     drawSprite8(TILE_A, 91, x + spacing*1, y); // A
     drawSprite8(TILE_M, 92, x + spacing*2, y); // M
     drawSprite8(TILE_E, 93, x + spacing*3, y); // E
-    drawSprite8(TILE_O, 94, x + spacing*5, y); // O (v√§li j√§lkeen E)
+    drawSprite8(TILE_O, 94, x + spacing*5, y); // O (v‰li j‰lkeen E)
     drawSprite8(TILE_V, 95, x + spacing*6, y); // V
     drawSprite8(TILE_E, 96, x + spacing*7, y); // E again
     drawSprite8(TILE_R, 97, x + spacing*8, y); // R
@@ -149,6 +151,12 @@ void drawMenu() {
     drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); // E
     drawSprite8(TILE_MENU_S, 93, x + spacing*3, y); // S
     drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); // S
+    
+    drawSprite8(TILE_MENU_S, 95, x + spacing*6, y); // P
+    drawSprite8(TILE_MENU_T, 96, x + spacing*7, y); // R
+    drawSprite8(TILE_MENU_A, 97, x + spacing*8, y); // E
+    drawSprite8(TILE_MENU_R, 98, x + spacing*9, y); // S
+    drawSprite8(TILE_MENU_T, 99, x + spacing*10, y); // S
 }  
 
 void pause() {
@@ -158,15 +166,17 @@ void pause() {
     int spacing = 12;
 
     drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // G
-    drawSprite8(TILE_MENU_S, 91, x + spacing*1, y); // A
-    drawSprite8(TILE_MENU_E, 92, x + spacing*2, y); // M
-    drawSprite8(TILE_MENU_R, 93, x + spacing*3, y); // E
-    drawSprite8(TILE_MENU_S, 94, x + spacing*4, y); // O (v√§li j√§lkeen E)
+    drawSprite8(TILE_MENU_A, 91, x + spacing*1, y); // A
+    drawSprite8(TILE_MENU_U, 92, x + spacing*2, y); // M
+    drawSprite8(TILE_MENU_S, 93, x + spacing*3, y); // E
+    drawSprite8(TILE_MENU_E, 94, x + spacing*4, y); // O (v‰li j‰lkeen E)
+    drawSprite8(TILE_MENU_D, 95, x + spacing*5, y); // O (v‰li j‰lkeen E)
 }  
 
 void reset_game() {
    for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
    collision = -1;
+   countBounce = 0;
    init_player(&player);
 	 init_spoon(&spoon);
 	 init_coins();
@@ -237,7 +247,6 @@ void buttonA() {
 
 void buttonB() {
    if (cooldownTimer != 0) {return;}
-   spoon.frame += 1;
    if (collision > -1) {
       gameItems2[collision].vy = -40;
       gameItems2[collision].frame += 1;
@@ -332,7 +341,15 @@ void gameLogicPs(void) {
         break;
       }  
     case 2:
-      break;
+       if (countBounce > LEVEL_3) {
+        nextLevel(3);
+        break;
+      }  
+    case 3:
+      if (countBounce > WIN) {
+        nextLevel(3);
+        break;
+      }  
   }  
   
 }
@@ -344,6 +361,8 @@ void gameLogic(void) {
      collision = 0;
    }  else if (checkCollisions(&spoon, gameItems2[1]))
    { collision = 1;
+ } else if (checkCollisions(&spoon, gameItems2[2]))
+   { collision = 2;
  } else {
    collision = -1;
  }    
@@ -352,7 +371,7 @@ void gameLogic(void) {
 
        // While item is in the air
        if (gameItems2[i].y <= MaxY && gameItems2[i].dropped == 0) {
-          gameItems2[i].vy = (gameItems2[i].vy < maxItemVy) ? maxItemVy : (gameItems2[i].vy += gameItems2[i].a);
+          gameItems2[i].vy > maxItemVy ? gameItems2[i].vy = maxItemVy : (gameItems2[i].vy += gameItems2[i].a);
   	   		gameItems2[i].y += gameItems2[i].vy/6;
   	   		gameItems2[i].x += gameItems2[i].vx/8;
        } else {
@@ -373,8 +392,6 @@ void gameLogic(void) {
   		} 
 
     }  
-    
-    // Player logic
     player.x = player.x > 224 ? 224 : player.x;
     player.x = player.x < 16 ? 16: player.x;
     
@@ -391,8 +408,6 @@ void animate(int frames) {
     return;
   }  
     player.frame += 1;    
-  return;
-    //drawSprite8(NUMBERS+animateTimer, 30, 100, 100);
 }  
 
 void animateItems(int frames) {
@@ -470,13 +485,14 @@ void redrawFrame() {
    // Draw bounce counter
    int res1 = NUMBERS + countBounce%10;
    int res2 = NUMBERS+ countBounce/10;
-   drawSprite8(res2, 26, 232-16, 8);  
+   drawSprite8(res1, 3, 232-8, 8);  
+   drawSprite8(res2, 4, 232-16, 8);  
    
   // Draw game timer
    int dig1 = NUMBERS + (gameTimer/10)%10;
    int dig2 = NUMBERS+ gameTimer/100;
-   drawSprite8(dig2, 28, 200-16, 8);  
-   drawSprite8(dig2, 5, 200-16, 8);  
+   drawSprite8(dig1, 5, 200-8, 8);  
+   drawSprite8(dig2, 6, 200-16, 8);  
    
    
    // Draw items on screen
@@ -488,28 +504,33 @@ void redrawFrame() {
    
    // Draw coins
    for (int i=0;i<noCoins;i++) {
-    drawSprite(COIN+coins[i].frame, i+20, coins[i].x, coins[i].y);
+    drawSprite(COIN+coins[i].frame, 20+i, coins[i].x, coins[i].y);
    }   
    
    // Debug
+   drawSprite8(NUMBERS+collision, 19, 140, 0);
 
    // Draw cooldown
    if (cooldownTimer > 0) {
-   } else {
-   }  
-   
-   if (dashTimer > 0) {
-     drawSprite(SNOWFLAKE, 7, 120, 8);
+     drawSprite(SNOWFLAKE, 7, 100, 8);
    } else {
      drawSprite(SNOWFLAKE, 7, 240, 160);
    }  
    
+   if (dashTimer > 0) {
+     drawSprite(SNOWFLAKE, 8, 120, 8);
+   } else {
+     drawSprite(SNOWFLAKE, 8, 240, 160);
+   }  
+   
    // draw floor
-   drawSprite(TILE_WOOD, 60, 0, 144);
+    for (int i=0;i<240/16;i++) {
+        drawSprite(TILE_WOOD, 40+i, i*16, 144);
+   } 
    
    
    // Draw level
-   drawSprite8(NUMBERS+currLevel, 75, 60, 8);
+   drawSprite8(NUMBERS+currLevel, 9, 60, 8);
  }  
 
 

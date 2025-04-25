@@ -8,7 +8,7 @@
 
 void Handler(void)
 {
-    REG_IME = 0x00; // Stop all other interrupt handling, while we handle this current one
+    REG_IME = 0x00; // Stop all other interrupt handling, while we handle this current oness
     
     if ((REG_IF & INT_TIMER1) == INT_TIMER1)
     {
@@ -29,7 +29,7 @@ void Handler(void)
                 break;
 
             case PAUSE_MODE:
-                pause(); //pauses
+                pause(); //pausesssss
                 break;
 
             case LEVEL_MODE:
@@ -76,7 +76,7 @@ void Handler(void)
     if ((REG_IF & INT_TIMER3) == INT_TIMER3)
     {
         animate(2);
-        animateItems(1); // animates items
+        animateItems(1); // animates itemss
         animateCoins(1);
         //animateSpoon(1);
     }
@@ -114,7 +114,7 @@ int main(void)
     REG_IME = 0x01;		// Enable interrupt handling
     
     // Set Timer Mode (fill that section and replace TMX with selected timer number)
-    REG_TM1D =	0xDE03;		// Runs game at approx 24fpss
+    REG_TM1D =	0xDE03;		// Runs game at approx 24fps
     REG_TM1CNT |= TIMER_FREQUENCY_64 | TIMER_ENABLE | TIMER_INTERRUPTS;
     
     REG_TM2D = 59100; //59100
