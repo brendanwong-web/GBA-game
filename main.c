@@ -29,7 +29,7 @@ void Handler(void)
                 break;
 
             case PAUSE_MODE:
-                pause(); //pausesssss
+                pause(); //pauses
                 break;
 
             case LEVEL_MODE:
@@ -83,13 +83,18 @@ void Handler(void)
     if ((REG_IF & INT_TIMER3) == INT_TIMER3)
     {
         animate(2);
-        animateItems(1); // animates itemssss
+        animateItems(1); // animates items
         animateCoins(1);
         animateSpoon(1);
+        for (int i=0;i<noCoins;i++){
+          if ((gameTimer%5)==0){
+        coins[i].frame = 1;
+      }  
+    }  
     }
 
     REG_IF = REG_IF; // Acknowledge interrupts
-    REG_IME = 0x01;  // Re-enable interruptssss
+    REG_IME = 0x01;  // Re-enable interrupts
 }
 
 inline void vsync()
@@ -104,13 +109,12 @@ inline void vsync()
 // -----------------------------------------------------------------------------
 int main(void)
 {   
-    // test comments
  
     REG_DISPCNT = 0x40 | BG1_ENABLE | OBJ_ENABLE; // Set Mode 2 DO NOT CHANGE!!
     
 	 fillSprites();
 	 fillPalette();
-	 gameMode = MENU_MODE; // Start game in play modess
+	 gameMode = MENU_MODE; // Start game in play modes
    init_player(&player);
 	 init_spoon(&spoon);
 	 init_items();
@@ -127,7 +131,7 @@ int main(void)
     REG_TM2D = 59100; //59100
     REG_TM2CNT |= TIMER_FREQUENCY_256 | TIMER_ENABLE | TIMER_INTERRUPTS; //This timer interrupts every 0.1s
     
-    REG_TM3D = 60535; //sttsssssss
+    REG_TM3D = 60535; //stssss
     REG_TM3CNT |= TIMER_FREQUENCY_1024 | TIMER_ENABLE | TIMER_INTERRUPTS; //This timer interrupts every 0.1s
     
   	 while(1){

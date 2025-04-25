@@ -7,9 +7,9 @@ int gameMode;
 int currLevel = 1;
 int countBounce = 0;
 int collision = -1;
-#define LEVEL_2 4
-#define LEVEL_3 6
-#define WIN 10
+#define LEVEL_2 10
+#define LEVEL_3 20
+#define WIN 30
 
 
 typedef struct gameCharacter {
@@ -87,6 +87,7 @@ void init_coins() {
  }  
 } 
 
+
 // End Coins
 
 // Items:
@@ -125,13 +126,13 @@ void init_items() {
 
 
 void drawGameOver() {
-    int x = 66;
-    int y = 70;
+    int x = 60;
+    int y = 8;
     int spacing = 12;
 
-    drawSprite8(TILE_G, 50, x + spacing*0, y); // G
-    drawSprite8(TILE_A, 51, x + spacing*1, y); // A
-    drawSprite8(TILE_M, 52, x + spacing*2, y); // M
+    drawSprite8(TILE_G, 58, x + spacing*0, y); // G
+    drawSprite8(TILE_A, 59, x + spacing*1, y); // A
+    drawSprite8(TILE_M, 60, x + spacing*2, y); // M
     drawSprite8(TILE_E, 53, x + spacing*3, y); // E
     drawSprite8(TILE_O, 54, x + spacing*5, y); // O (väli jälkeen E)
     drawSprite8(TILE_V, 55, x + spacing*6, y); // V
@@ -141,9 +142,9 @@ void drawGameOver() {
 
 void drawMenu() {
     for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
-        int y = 100;
+    int y = 100;
     int spacing = 12;
-    int x = (240-spacing*10)/2;
+    int x = (240-spacing*10-8)/2;
 
 
     drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // P
@@ -161,16 +162,16 @@ void drawMenu() {
 
 void pause() {
     gameMode = PAUSE_MODE;
-    int x = 66;
-    int y = 70;
+    int x = 60;
+    int y = 6;
     int spacing = 12;
 
-    drawSprite8(TILE_MENU_P, 90, x + spacing*0, y); // G
-    drawSprite8(TILE_MENU_A, 91, x + spacing*1, y); // A
-    drawSprite8(TILE_MENU_U, 92, x + spacing*2, y); // M
-    drawSprite8(TILE_MENU_S, 93, x + spacing*3, y); // E
-    drawSprite8(TILE_MENU_E, 94, x + spacing*4, y); // O (väli jälkeen E)
-    drawSprite8(TILE_MENU_D, 95, x + spacing*5, y); // 
+    drawSprite8(TILE_MENU_P, 55, x + spacing*0, y); // G
+    drawSprite8(TILE_MENU_A, 56, x + spacing*1, y); // A
+    drawSprite8(TILE_MENU_U, 57, x + spacing*2, y); // M
+    drawSprite8(TILE_MENU_S, 58, x + spacing*3, y); // E
+    drawSprite8(TILE_MENU_E, 59, x + spacing*4, y); // O (väli jälkeen E)
+    drawSprite8(TILE_MENU_D, 60, x + spacing*5, y); // 
 }  
 
 void reset_game() {
@@ -232,6 +233,7 @@ void buttonSel() {
    if (gameMode == PLAY_MODE) {
        pause();
    } else {
+      for(int j = 0; j < 128; j++){drawSprite(0, j, 240,160);}
      gameMode = PLAY_MODE;
    }  
 
@@ -313,15 +315,12 @@ void gameLogicPs(void) {
   // Iterate over all coins
   for (int i=0;i<noCoins;i++) {
     if (checkCollisions(&gameItems2[0], coins[i])){
-      coins[i].x = i*16;
+      coins[i].x = 17+i*16;
       coins[i].y = 140;
       countBounce += 3;
       }
+      
   }
-  
-  if ((gameTimer%20) == 0) {
-    coins[0].frame = 1;
-  }  
   
   if (cooldownTimer > 0) {   
     cooldownTimer -= 1;
@@ -332,7 +331,7 @@ void gameLogicPs(void) {
   }
   
   gameTimer += 1;
-  
+
 
   
   switch(currLevel) {
@@ -404,7 +403,7 @@ void gameLogic(void) {
 void animate(int frames) {
   if (player.frame == 0) {
     return;
-  } else if (player.frame == frames){
+  } else if (player.frame == frames){  
     player.frame = 0;
     return;
   }  
@@ -435,9 +434,8 @@ void animateItems(int frames) {
   }  
   
 }  
-
 void animateCoins(int frames) {
-    int i;
+  int i;
   for (i=0;i<noCoins;i++){
     if (coins[i].frame == 0) {
       continue;
@@ -446,7 +444,6 @@ void animateCoins(int frames) {
       continue;
     }  
     coins[i].frame += 1;
-    
   }  
 }  
 
@@ -497,22 +494,23 @@ void redrawFrame() {
        }
    // Draw bounce counter
    int scorex = 170;
-   drawSprite8(TILE_MENU_S, 98, scorex+textSpacing*0, 8); 
-   drawSprite8(TILE_MENU_C, 99, scorex+textSpacing*1, 8); 
-   drawSprite8(TILE_MENU_O, 100, scorex+textSpacing*2, 8); 
-   drawSprite8(TILE_MENU_R, 96, scorex+textSpacing*3, 8); 
-   drawSprite8(TILE_MENU_E, 97, scorex+textSpacing*4, 8); 
+   drawSprite8(TILE_MENU_S, 98, scorex+textSpacing*0, 7); 
+   drawSprite8(TILE_MENU_C, 99, scorex+textSpacing*1, 7); 
+   drawSprite8(TILE_MENU_O, 95, scorex+textSpacing*2, 7); 
+   drawSprite8(TILE_MENU_R, 96, scorex+textSpacing*3, 7); 
+   drawSprite8(TILE_MENU_E, 97, scorex+textSpacing*4, 7); 
    int res1 = NUMBERS + countBounce%10;
    int res2 = NUMBERS+ countBounce/10;
-   drawSprite8(res1, 3, scorex + textSpacing*5 + 8, 7);  
-   drawSprite8(res2, 4, scorex + textSpacing*5, 7);  
+   drawSprite8(res1, 3, scorex + textSpacing*5 + 8, 6);  
+   drawSprite8(res2, 4, scorex + textSpacing*5, 6);  
    
   // Draw game timer
-   int timerx = 100;
+   int timerx = 6;
    int dig1 = NUMBERS + (gameTimer/10)%10;
    int dig2 = NUMBERS+ gameTimer/100;
-   drawSprite8(dig1, 5, timerx+8, 6);  
-   drawSprite8(dig2, 6, timerx, 6);  
+   drawSprite(HOURGLASS, 112, timerx, 6);
+   drawSprite8(dig1, 5, timerx+24, 10);  
+   drawSprite8(dig2, 6, timerx+16, 10);  
    
    
    // Draw items on screen
@@ -524,37 +522,45 @@ void redrawFrame() {
    
    // Draw coins
    for (int i=0;i<noCoins;i++) {
-    drawSprite(COIN+coins[i].frame, 90+i, coins[i].x, coins[i].y);
+    drawSprite(COIN+coins[i].frame, 100+i, coins[i].x, coins[i].y);
    }   
    
    // Debug
-   drawSprite8(NUMBERS+collision, 19, 140, 0);
-
+   if (collision >-1) {
+   drawSprite8(CIRCLE, 19, player.x+4, player.y-20);
+   } else {
+        drawSprite8(CIRCLE, 19,126, 160);
+   }    
    // Draw cooldown
    if (cooldownTimer > 0) {
-     drawSprite(SNOWFLAKE, 7, 100, 8);
+     drawSprite(SNOWFLAKE, 7, 60, 7);
    } else {
      drawSprite(SNOWFLAKE, 7, 240, 160);
    }  
    
    if (dashTimer > 0) {
-     drawSprite(SNOWFLAKE, 8, 120, 8);
+     drawSprite(LIGHTNING, 8, 80, 7);
    } else {
-     drawSprite(SNOWFLAKE, 8, 240, 160);
+     drawSprite(LIGHTNING, 8, 240, 160);
    }  
    
    // draw floor
     for (int i=0;i<240/16;i++) {
-        drawSprite(TILE_WOOD, 70+i, i*16, 144);
+        drawSprite(TILE_WOOD, 113+i, i*16, 144);
    } 
+   
+   for (int i=0;i<currLevel*2;i++){
+     drawSprite(BOXBOX, 107+i, 16+i*16, 140);
+   }  
    
    
    // Draw level
-   int textx = 8;
-   drawSprite8(TILE_MENU_L, 90, textx+textSpacing*0, 8); 
-   drawSprite8(TILE_MENU_V, 91, textx+textSpacing*1, 8); 
-   drawSprite8(TILE_MENU_L, 92, textx+textSpacing*2, 8); 
-   drawSprite8(NUMBERS+currLevel, 9, textx+textSpacing*3, 7);
+   int textx = 190;
+   int texty = 18;
+   drawSprite8(TILE_MENU_L, 90, textx+textSpacing*0, texty); 
+   drawSprite8(TILE_MENU_V, 91, textx+textSpacing*1, texty); 
+   drawSprite8(TILE_MENU_L, 92, textx+textSpacing*2, texty); 
+   drawSprite8(NUMBERS+currLevel, 9, textx+textSpacing*4, texty);
  }  
 
 
